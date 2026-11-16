@@ -1,6 +1,6 @@
 ---
 name: principle-encode-lessons-in-structure
-description: "Apply when writing the same instruction twice: encode it."
+description: "同一条指示写到第二遍时应用，编码它."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,28 +11,28 @@ metadata:
     related_skills: []
 ---
 
-# Encode Lessons in Structure
+# 把教训编码进结构
 
-Encode recurring fixes in mechanisms (tools, code, metadata, automation) instead of textual instructions. Every error, human correction, and unexpected outcome is a learning signal. Capture it, route it, and close the loop.
+把反复出现的修复编码进机制（工具、代码、元数据、自动化），而不是文字指示。每一次报错、人工纠正和意外结果都是学习信号。捕获它，路由它，闭环。
 
-**Why:** Textual instructions are easy to miss. They require the reader to notice, remember, and comply. Structural mechanisms (lint rules, metadata flags, runtime checks, automation scripts) enforce the rule without cooperation.
+**为什么：** 文字指示容易被漏掉。它要求读者注意到、记住、照做。结构性机制（lint 规则、元数据标记、运行时检查、自动化脚本）不需要配合就能强制执行规则。
 
-**Pattern:**
-When you catch yourself writing the same instruction a second time:
-1. Ask: can this be a lint rule, a metadata flag, a runtime check, or a script?
-2. If yes, encode it. Delete the instruction
-3. If no (requires judgment), make the instruction more prominent and add an example of the failure mode
+**模式：**
+当你发现自己在第二遍写同一条指示时：
+1. 问，这能不能做成一条 lint 规则、一个元数据标记、一个运行时检查或一个脚本？
+2. 能，就编码它。删掉那条指示
+3. 不能（需要判断），就把指示写得更显眼，并加一个失败模式的例子
 
-**Pick the strongest mechanism.** When more than one mechanism would work, choose the strongest the situation allows (an unrepresentable state that cannot compile, then a lint or banned API that fails CI, then a canonical helper, then a runtime check), because agents copy whatever the surrounding code already does and a weaker guard becomes the next template.
+**挑最强的机制。** 不止一种机制可行时，选情境允许的最强那种（先是无法表示、编译不过的状态，再是让 CI 失败的 lint 或禁用 API，再是规范 helper，再是运行时检查），因为代理会照抄周围代码已有的做法，弱守卫会成为下一个模板。
 
-**Corollary:** If the fix is structural, only use the structural fix. The instruction is the symptom.
+**推论：** 如果修复是结构性的，就只用结构性修复。指示是症状。
 
-**Feedback loop:**
-- **Capture every correction.** When the human intervenes or tests fail, decide if it's a one-off or a pattern.
-- **Route to the right layer.** One-off -> brain note. Recurring fix -> skill or lint rule. Systemic issue -> principle.
-- **Close the loop.** Don't just record. Apply now or create a concrete todo.
+**反馈回路：**
+- **捕获每一次纠正。** 人工介入或测试失败时，判断它是一次性的还是一个模式。
+- **路由到正确的层。** 一次性 -> 记忆笔记。反复出现的修复 -> 技能或 lint 规则。系统性问题 -> 原则。
+- **闭环。** 别只记录。现在就应用，或建一个具体的待办。
 
-**Anti-patterns:**
-- Acknowledging without recording ("I'll keep that in mind" does not persist)
-- Recording without routing (a brain note about a lint rule that should exist is wasted unless the lint rule gets implemented)
-- Fixing without generalizing (fixing one instance while leaving the recurring pattern intact)
+**反模式：**
+- 承认了但不记录（「我会记住的」不会持久化）
+- 记录了但不路由（关于一条该存在的 lint 规则的记忆笔记，除非 lint 规则被实现，否则就是浪费）
+- 修了但不泛化（修掉一个实例，留下反复出现的模式原样不动）

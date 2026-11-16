@@ -1,6 +1,6 @@
 ---
 name: principle-fix-root-causes
-description: "Apply when debugging: trace each symptom to its root."
+description: "调试时应用，把每个症状追到根因."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,18 +11,18 @@ metadata:
     related_skills: []
 ---
 
-# Fix Root Causes
+# 修根因
 
-When debugging, fix the fault, not the place where it surfaced. The symptom is where a wrong state became visible. The root cause is the first place the system did something it should not do, or failed to handle a state it should handle.
+调试时，修故障本身，不是它冒出来的地方。症状是错误的状态变得可见的地方。根因是系统第一次做了不该做的事，或没处理本该处理的状态的地方。
 
-**Why:** A symptom fix hides the evidence and leaves the fault free to surface somewhere else. Each one makes the system harder to reason about, because the code now carries a workaround for a bug that nobody named.
+**为什么：** 修症状会藏起证据，让故障自由地在别处冒出来。每修一次症状，系统就更难推理，因为代码里现在背着一个没人点名过的 bug 的变通方案。
 
-**Pattern:**
-- Reproduce first.
-- Ask "why" at each step until the answer is a wrong decision in the code, not a consequence of an earlier one.
-- When stuck, instrument. Read the actual error and the actual state. Do not guess.
-- Ask whether the state that triggered the symptom is legitimate. If the system may be in that state, the code that broke on it is the root cause, and handling the state there is the fix. If the state should never exist, a check where it broke hides the bug. Find what produced the state. Guards, retries, swallowed errors, clamped values, and discarded state are the usual ways to hide a bug.
-- When something fails only after a restart, suspect persisted state first: config files, caches, lock files, serialized state.
-- Check for the pattern, not just the instance. Find every place with the same fault and fix them all.
-- If a workaround needs a paragraph-long comment to justify it, the code is wrong. Fix the code, not the comment.
-- If the deciding fact took a deep dig to find, propose the cheap, always-on signal that would have shown it at first look.
+**模式：**
+- 先复现。
+- 每一步都问「为什么」，直到答案是代码里一个错误的决定，而不是更早某个决定的后果。
+- 卡住就打点。读真实的报错和真实的状态。别猜。
+- 问触发症状的那个状态是否合法。如果系统可能处于那个状态，在它上面崩掉的代码就是根因，在那里处理这个状态就是修复。如果那个状态绝不该存在，在崩掉的地方加检查就是藏 bug。找出是什么造出了这个状态。守卫、重试、吞掉的错误、钳位的值、丢弃的状态，都是藏 bug 的常见手法。
+- 只在重启之后才失败的东西，先怀疑持久化状态，配置文件、缓存、锁文件、序列化状态。
+- 查模式，不只查实例。找出每一个有同样故障的地方，全部修掉。
+- 一个变通方案需要一段话那么长的注释来辩护，代码就是错的。修代码，不是修注释。
+- 如果起决定作用的事实是深挖才找到的，提出那个便宜的、常开的信号，让人第一眼就能看到它。

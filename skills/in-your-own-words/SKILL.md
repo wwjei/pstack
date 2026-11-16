@@ -1,6 +1,6 @@
 ---
 name: in-your-own-words
-description: "Restate the user's goals and problem before work."
+description: "开工前用你自己的话重述用户的目标和问题."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,4 +11,4 @@ metadata:
     related_skills: []
 ---
 
-Restate in your own words what you think the user's goals are and what problem they're trying to solve.
+用你自己的话重述一遍，你认为用户的目标是什么，以及他们试图解决什么问题。

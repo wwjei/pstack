@@ -1,6 +1,6 @@
 ---
 name: principle-model-the-domain
-description: "Apply when stateful logic branches on scattered conditions."
+description: "有状态逻辑靠散落条件分支时应用."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,23 +11,23 @@ metadata:
     related_skills: []
 ---
 
-# Model the Domain
+# 给领域建模
 
-Encode the real domain in a data structure instead of scattering it across conditionals.
+把真实领域编码进一个数据结构，而不是散落在条件判断里。
 
-**Why:** Scattered booleans, repeated shape assumptions, and branching spread across files are accidental complexity. A structure that matches the domain makes invalid states unrepresentable and deletes branches. Choosing it at write time is cheap. Recovering it later reads as a refactor and gets deferred.
+**为什么。** 散落的布尔值、重复的形状假设、跨文件蔓延的分支，都是偶然复杂度。匹配领域的结构让非法状态无法被表示，还能删掉分支。写代码时选它很便宜。事后补回来看着像重构，就会被往后拖。
 
-**Reach for structures like these:**
+**伸手去拿这类结构。**
 
-- A state machine instead of scattered booleans, phases, or lifecycle checks.
-- A typed object/model instead of loose parameters or repeated shape assumptions.
-- A map, registry, lookup table, or discriminated union instead of branching spread across files.
-- A reducer or command/event model instead of ad hoc state mutations.
-- A module organized around one body of domain knowledge instead of a sequence such as load, validate, transform, and save. Execution order is not ownership.
-- A small module boundary that gathers repeated behavior, ownership, or invariants.
-- A queue, cache, index, graph/tree, or normalized collection where the data access pattern calls for it.
-- Any other structure that fits. When none fits, work out what the code must never allow and how the data gets read, then find the structure that encodes exactly that.
+- 用状态机，不用散落的布尔值、阶段标记或生命周期检查。
+- 用带类型的对象/模型，不用松散的参数或重复的形状假设。
+- 用映射、注册表、查找表或可辨识联合，不用跨文件蔓延的分支。
+- 用 reducer（归约器）或命令/事件模型，不用随手的状态改动。
+- 模块围绕一块领域知识组织，而不是按加载、校验、变换、保存这样的执行序列。执行顺序不是所有权。
+- 用小的模块边界收拢重复的行为、所有权或不变量。
+- 数据访问模式需要时，就用队列、缓存、索引、图/树或规范化集合。
+- 其他合适的结构也行。都不合适时，先弄清代码绝不允许什么、数据怎么被读，再找恰好编码这两点的结构。
 
-Do not force an abstraction. Prefer boring code if the current shape is already clear, local, and unlikely to grow. Be skeptical of an abstraction that adds indirection without removing branches, duplicated rules, invalid states, or lifecycle risk.
+不要硬造抽象。当前形状已经清晰、局部、不太会长大时，宁要无聊的代码。对只添间接层、却不删分支、不删重复规则、不删非法状态、不降生命周期风险的抽象，保持怀疑。
 
-The sign that you skipped this is a new feature that grows an existing if/else chain by one more branch, or a second boolean that must stay in sync with the first. Temporal decomposition is another sign. Phase-named modules repeat the same domain rules across steps.
+跳过这条的迹象是，新功能让既有的 if/else 链又多长一个分支，或者多出第二个必须跟第一个保持同步的布尔值。按时间分解是另一个迹象。按阶段命名的模块在各步骤里重复同样的领域规则。

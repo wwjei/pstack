@@ -1,6 +1,6 @@
 ---
 name: principle-minimize-reader-load
-description: "Apply when reviewing code that is hard to read or trace."
+description: "审查难读难追的代码时应用."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,20 +11,20 @@ metadata:
     related_skills: []
 ---
 
-# Minimize Reader Load
+# 降低读者负担
 
-Maintainability is the work a reader must do to understand code. Track two axes:
-1. **Layers to trace.** How many indirections sit between the question and the answer.
-2. **State to hold.** How much hidden or mutable context the reader must keep in their head.
+可维护性就是读者为理解代码必须做的功。盯住两个轴。
+1. **要追的层数。** 问题和答案之间隔着多少层间接。
+2. **要记住的状态。** 读者必须在脑子里装下多少隐藏或可变的上下文。
 
-**Why:** Code is read far more than it is written. LOC, cyclomatic complexity, and "clean architecture" are proxies. Reader load is the thing that matters. The two axes are independent. A flat file with 50 globals can be as hard to reason about as a 6-layer adapter stack. Guard both. This is the human analog of [Guard the Context Window](../principle-guard-the-context-window/SKILL.md). Working memory is finite for readers too.
+**为什么。** 代码被读的次数远多于被写的次数。代码行数、圈复杂度和「整洁架构」都是替代品。读者负担才是要紧的东西。两个轴相互独立。一个带 50 个全局变量的扁平文件，推理起来可以跟 6 层适配器栈一样难。两个都要守。这是 [守住上下文窗口](../principle-guard-the-context-window/SKILL.md) 在人类身上的对应版。读者的工作记忆同样有限。
 
-**The pattern:**
-- **Collapse layers** that cost more than they save: wrappers with one caller, adapters with no second implementation, speculative indirection that was never needed. Inline them.
-- **Make adjacent layers change the abstraction.** A layer that repeats the same methods and arguments adds reader load without compression. Collapse pass-through layers.
-- **Demand interface compression.** A broad interface that hides little complexity makes readers learn both the surface and the implementation. Prefer boundaries that hide meaningful decisions.
-- **Shrink state scope:** prefer pure functions (returns over mutations), locals over fields, fields over module state, and module state over globals. Derive instead of sync.
-- **Name the invariant at the boundary,** not in every consumer, so the reader learns it once.
-- Before adding a layer or a piece of state, ask: does this reduce reader load somewhere else by at least as much?
+**模式。**
+- **压掉得不偿失的层。** 只有一个调用方的包装层、没有第二个实现的适配器、从来就不需要的投机间接层。内联掉。
+- **让相邻的层改变抽象。** 重复同样方法和参数的层只添读者负担，不做压缩。压掉透传层。
+- **要求接口压缩。** 隐藏不了多少复杂度的宽接口，逼读者既学表面又学实现。优先选能藏住有意义决策的边界。
+- **缩小状态范围。** 优先纯函数（用返回值不用改动），局部变量优于字段，字段优于模块状态，模块状态优于全局变量。能派生就别同步。
+- **在边界处点名不变量，** 不要在每个消费方各写一遍，让读者只学一次。
+- 加一层或一份状态之前先问，它有没有在别处省下至少同样多的读者负担？
 
-**The test:** Can a new reader answer "where does X come from?" and "what can change X?" in under 30 seconds? If not, cut layers or cut state.
+**检验。** 新读者能不能在 30 秒内回答「X 从哪来？」和「什么能改 X？」？不能就砍层或砍状态。

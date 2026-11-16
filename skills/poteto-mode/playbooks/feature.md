@@ -1,29 +1,29 @@
-# Feature Playbook
+# 新功能操作手册
 
-**Trigger:** New behavior or changed behavior requested.
+**触发条件：** 有人要新行为或改行为。
 
-## Steps
+## 步骤
 
-1. **Understand the subsystem.** Run `pstack:how` over every module the feature touches. Don't design until you know what's already there.
+1. **摸懂子系统。** 对这个功能要碰的每个模块跑 `pstack:how`。没搞清已经有什么之前，别设计。
 
-2. **Design exploration.** Run `pstack:architect` - explore approaches, pick one, document why. Output: a short design doc with the chosen approach and its trade-offs.
+2. **设计探索。** 跑 `pstack:architect`，探索各种方案，选一个，写清为什么。产出：一份短设计文档，写明选定的方案和它的取舍。
 
-3. **Throughput checkpoint.** Before delegating, answer in writing:
-   - What are the blocking first steps (must happen before anything else)?
-   - What workstreams are independent and parallelizable?
-   - What shared mutable state exists between workstreams?
-   - What is the smallest safe decomposition into delegate-sized units?
+3. **吞吐量检查点。** 委派之前，书面回答：
+   - 哪些是阻塞性的首批步骤（必须先于其他一切发生）？
+   - 哪些工作线相互独立、可以并行？
+   - 工作线之间存在哪些共享可变状态？
+   - 拆成子代理大小的单元，最小且安全的拆法是什么？
 
-4. **Delegate implementation.** Use `delegate_task` for each unit with specific scope: files to touch, interfaces to respect, tests to write. You write the contracts; subagents write the code.
+4. **委派实现。** 每个单元用 `delegate_task`，带上具体范围：要碰的文件、要遵守的接口、要写的测试。你写契约，子代理写代码。
 
-5. **Review every diff.** Read what came back with `read_file`. Check: does it match the design? Does it introduce unrequested abstractions? Apply the ponytail ladder.
+5. **审每一份 diff。** 用 `read_file` 读回来的东西。检查：跟设计一致吗？有没有引入没人要的抽象？套用 ponytail 阶梯。
 
-6. **Verify on matching surface.** Run the feature end-to-end - `terminal` for CLI, `browser_navigate` for UI. Not "tests pass" alone; the actual user-facing behavior works.
+6. **在匹配的面上验证。** 端到端跑这个功能，CLI 用 `terminal`，UI 用 `browser_navigate`。不能只是「测试通过」，要真实的面向用户的行为能用。
 
-7. **Rebase into small ordered commits.** Each commit compiles, passes tests, and tells one story. Squash fixups.
+7. **变基成小而有序的提交。** 每个提交都能编译、过测试、讲一个故事。压掉修补提交。
 
-8. **If contested** - design choice is non-obvious or risky - run `pstack:interrogate` before shipping. Let it attack your assumptions.
+8. **如果有争议**，设计选择不明显或有风险，发布前跑 `pstack:interrogate`。让它攻击你的假设。
 
-## Key Rule
+## 关键规则
 
-You own the design. Delegate implementation, stay in the lead. A subagent writes code; you decide *what* code to write and whether the result ships.
+设计归你负责。委派实现，自己保持主导。子代理写代码，你决定写*什么*代码，以及结果能不能发布。

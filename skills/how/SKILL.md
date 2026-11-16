@@ -57,7 +57,7 @@ metadata:
 
 ## 委派模式
 
-为 `delegate_task` 做拆解时：
+为 `delegate_task` 做拆分时：
 
 ```
 每份子代理任务说明：

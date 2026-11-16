@@ -6,9 +6,9 @@ Fork of [pstack](https://github.com/cursor/plugins/tree/main/pstack) by poteto (
 
 ## 中文版（zh-cn 分支）
 
-核心技能已译成中文：`poteto-mode`（含编写技能的操作手册）、`how`、`architect`、`interrogate`、`swarm`、`unslop`、`deslop`、`setup-pstack`。其余技能与 `docs/guide/` 保持英文原文。
+`skills/` 下全部 90 个 markdown 已译成中文：52 个技能的 `SKILL.md`、`poteto-mode` 的 17 本操作手册，以及各技能挂的 `references/`。`docs/guide/` 的 10 篇教程仍是英文原文。
 
-术语与文风统一按 [中文术语表](docs/zh-cn-glossary.md)。技能名、工具名、配置键、`pstack:` 引用一律保留原文，改了会失效。
+术语与文风统一按 [中文术语表](docs/zh-cn-glossary.md)，含原则名、来源类别、报告小节名与跨文件译法裁定。技能名、工具名、配置键、`pstack:` 引用、代码块一律保留原文，改了会失效。
 
 ## What it does
 

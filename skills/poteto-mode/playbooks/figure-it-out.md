@@ -1,28 +1,28 @@
-# Figure It Out Playbook
+# 自己想办法操作手册
 
-**Trigger:** Large migration, ambitious multi-part change, or anything where no narrower playbook fits.
+**触发条件：** 大型迁移、有野心的多部分改动，或任何没有更窄手册合适的情况。
 
-## Steps
+## 步骤
 
-1. **Frame the work.** Before writing code, answer three things in writing:
-   - **Definition of done** - a falsifiable predicate. "All 200 endpoints return valid OpenAPI responses" not "API is cleaned up."
-   - **Scope quantified** - how many files, modules, endpoints, records? Measure with `search_files` / `terminal`. Unknown scope = unknown timeline.
-   - **Rigor level** - what verification is required at each step? (Test suite, manual check, type-checker, linter, benchmark.)
+1. **框定工作。** 写代码之前，书面回答三件事：
+   - **完成定义** - 一个可证伪的判定条件。「全部 200 个端点返回有效的 OpenAPI 响应」，而不是「API 清理干净了」。
+   - **范围量化** - 多少文件、模块、端点、记录？用 `search_files` / `terminal` 测量。范围未知 = 时间线未知。
+   - **严格度** - 每一步要求什么验证？（测试套件、手动检查、类型检查器、linter、基准。）
 
-2. **Design the workflow.** Decompose into atomic landable units - each one compiles, passes tests, and can ship independently.
-   - Order by **riskiest unknown first**. The thing most likely to invalidate the plan goes first; don't save it for last.
-   - Build the **verification harness before the work**. If you need a test, a script, or a check to verify units, write it now. Working without a verifier is flying blind.
-   - Use `pstack:architect` if the decomposition is non-obvious.
+2. **设计工作流。** 拆成原子的可落地单元，每个都能编译、过测试、独立发布。
+   - 按**最危险的未知在前**排序。最可能让计划作废的东西放最前，别留到最后。
+   - **在工作之前造好验证工装。** 如果你需要一个测试、一个脚本或一个检查来验证单元，现在就写。没有验证器就干活等于盲飞。
+   - 如果拆法不明显，用 `pstack:architect`。
 
-3. **Run the loop.** Each unit is an experiment:
-   - **Hypothesis:** "Changing X will advance the predicate without breaking Y."
-   - **Smallest change** that tests the hypothesis. Delegate via `delegate_task` for mechanical work.
-   - **Measure:** run the verification harness.
-   - **Keep or revert.** No half-landed units.
-   - Commit with a message that links to the hypothesis.
+3. **跑循环。** 每个单元是一次实验：
+   - **假设：** 「改 X 会推进判定条件，且不弄坏 Y。」
+   - **最小改动**来检验假设。机械工作用 `delegate_task` 委派。
+   - **测量：** 跑验证工装。
+   - **留下或回退。** 不留半落地的单元。
+   - 提交，信息关联到那个假设。
 
-4. **Log decisions throughout.** When you choose approach A over B, note why in a commit message or comment. Future-you (or the reviewer) needs the reasoning, not just the result.
+4. **全程记录决策。** 当你选方案 A 而非 B，把为什么记进提交信息或注释。未来的你（或审查者）需要的是推理，不只是结果。
 
-## Key Rule
+## 关键规则
 
-When no playbook fits, design one. Bias toward more rigor, not less - the cost of too much verification is minutes; the cost of too little is a rollback. Every unit lands clean or doesn't land.
+没有手册合适时，设计一本。倾向于更严格，而不是更松，验证过多的代价是几分钟，验证过少的代价是一次回滚。每个单元要么干净落地，要么不落地。

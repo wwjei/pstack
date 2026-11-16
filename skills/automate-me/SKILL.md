@@ -1,6 +1,6 @@
 ---
 name: automate-me
-description: "Use for 'automate me' or to build a personal -mode skill."
+description: "用户说「把我自动化」时，生成个人 -mode 技能."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -13,99 +13,98 @@ metadata:
 
 # Automate me
 
-A guided flow for turning the user's working conventions into a skill agents will follow. The output is one `-mode` skill tailored to them (e.g. `jay-mode`, `priya-mode`).
+一条带引导的流程，把用户的工作惯例变成一个代理会遵守的技能。产出是一个为他定制的 `-mode` 技能（例如 `jay-mode`、`priya-mode`）。
 
-This skill orchestrates three others: an inline mining pass (see step 1), Hermes Agent's built-in `create-skill` (authoring), and the **unslop** skill (prose discipline). It sequences them. It doesn't replace them.
+这个技能编排另外三个：一趟内联的历史挖掘（见步骤 1）、Hermes Agent 内置的 `create-skill`（负责编写），以及 **unslop** 技能（负责文字纪律）。它给它们排序，不替代它们。
 
-## Flow
+## 流程
 
-### 0. Check for an existing skill
+### 0. 先查有没有现成的技能
 
-Look recursively for `Hermes profile skills directory**/*-mode/SKILL.md` and `~/Hermes profile skills directory*-mode/SKILL.md` matching the user's handle. Mode skills can live in a personal category directory (`Hermes profile skills directory<handle>/`), not only at the top level. If one exists, confirm intent with `clarify` (unless they already said "update my skill" or similar):
+递归查找 `Hermes profile skills directory**/*-mode/SKILL.md` 和 `~/Hermes profile skills directory*-mode/SKILL.md`，匹配用户的 handle。mode 技能可能放在个人分类目录里（`Hermes profile skills directory<handle>/`），不一定在顶层。如果已经有，用 `clarify` 确认意图（除非他已经说过「更新我的技能」这类话）：
 
-- Update the existing skill (default for repeat runs)
-- Start fresh (rare, ask why before doing it)
+- 更新现有技能（重复运行时的默认选项）
+- 从头重做（少见，动手前先问为什么）
 
-Update mode changes the rest of the flow:
-- Step 1 mines only history since the skill was last edited (`git log -1 --format=%cI <path>`).
-- Step 2 asks what's changed or missing, not what to capture from zero.
-- Step 4 edits the existing file in place. Preserve sections the user hasn't contradicted. Revise ones with new evidence. Add new sections only for genuinely new rules.
+更新模式会改变后面的流程：
+- 步骤 1 只挖技能上次编辑之后的历史（`git log -1 --format=%cI <path>`）。
+- 步骤 2 问的是哪里变了、哪里缺了，不是从零开始要记什么。
+- 步骤 4 就地改现有文件。用户没有推翻的小节保留。有新证据的小节修订。只有确实是新规则时才加新小节。
 
-### 1. Mine their history
+### 1. 挖他的历史
 
-Locate relevant history with the `session_search` tool before fanning out. It searches the current Hermes profile's session history by query. Never read another profile's session data.
+并行分发之前，先用 `session_search` 工具定位相关历史。它按查询搜索当前 Hermes profile 的会话记录。绝不读另一个 profile 的会话数据。
 
-Survey recent agent conversations within that scope for recurring patterns. Run multiple parallel subagents across slices of history (e.g. last 2-4 weeks, split into 3 slices so each has enough material). Each slice mining subagent queries `session_search` for its own date slice, looks for the signals below, and returns a short structured list of patterns it saw with evidence pointers. Default signals worth hunting:
+在这个范围内普查最近的代理对话，找反复出现的模式。跨历史切片派多个并行子代理（例如最近 2 到 4 周，切成 3 片，让每片都有足够素材）。每个切片挖掘子代理针对自己那段日期查 `session_search`，找下面这些信号，返回一份简短的结构化模式清单，带证据指针。默认值得猎取的信号：
 
-- Response preferences (length, tone, format, "dumb it down" corrections)
-- Delegation habits (subagents, models, specialized workflows, parallelism)
-- Verification posture (what "done" means, unit tests vs live repro, reviewers)
-- Code and prose discipline (style, principles cited, lint/format tools)
-- Process conventions (worktrees, commits, PRs, review/merge tooling)
-- Meta preferences (fixing skills mid-task, proposing new ones)
+- 回复偏好（长度、语气、格式、「说人话」这类纠正）
+- 委派习惯（子代理、模型、专门流程、并行度）
+- 验证姿态（「完成」是什么意思、单元测试还是真机复现、要不要审查者）
+- 代码与文字纪律（风格、引用的原则、lint 与格式化工具）
+- 流程惯例（worktree、提交、PR、审查与合并工具）
+- 元偏好（任务中途修技能、提议建新技能）
 
-Cross-check across slices before elevating a signal. Patterns seen in 2+ slices are high-confidence. Lone signals are weak and usually get dropped.
+要把一个信号提级之前，先跨切片交叉核对。在 2 个以上切片里都出现的模式是高置信度。孤例信号很弱，通常丢掉。
 
-### 2. Ask the user directly
+### 2. 直接问用户
 
-Mining misses intent that hasn't come up yet. Use the `clarify` tool (structured multi-choice) rather than asking the user to type from scratch.
+挖掘挖不到还没出现过的意图。用 `clarify` 工具（结构化多选），别让用户从零开始打字。
 
-Shape: one or two questions with 4-6 options each, `allow_multiple: true` for category questions. Start broad ("Which areas matter most?"), then follow up on selected areas with specific options. After the structured rounds, one free-form chat question catches anything the options missed.
+形态：一到两个问题，每个 4 到 6 个选项，分类类问题用 `allow_multiple: true`。先问宽的（「哪些方面最要紧？」），再针对选中的方面追问具体选项。结构化几轮之后，用一个开放式聊天问题兜住选项漏掉的东西。
 
-Don't dump 20 questions.
+不要一口气砸 20 个问题。
 
-### 3. Cluster findings
+### 3. 把发现项聚类
 
-Group the combined signals into sections. Common ones (use only what applies):
+把合起来的信号分组成小节。常见的几类（只用适用的）：
 
-- **Response style**: length, tone, format.
-- **Autonomy**: how much to do without asking, MCP tool use.
-- **Understand first**: which skills to reach for when scoping or investigating a change.
-- **Subagents**: default, parallelism, model-to-task, specialized workflows.
-- **Prose / code discipline**: principles, lint tools, style guides.
-- **Review and verify**: repro posture, verification skills, live-testing tools.
-- **Process**: git worktrees, commits, PRs, review/merge tooling.
-- **Skills**: skill-authoring habits, fix-the-skill-first, proposing new skills.
+- **回复风格**：长度、语气、格式。
+- **自主权**：不问就能做多少，MCP 工具怎么用。
+- **先理解**：划定范围或调查改动时该伸手拿哪些技能。
+- **子代理**：默认开不开、并行度、模型对任务的搭配、专门流程。
+- **文字与代码纪律**：原则、lint 工具、风格指南。
+- **审查与验证**：复现姿态、验证技能、真机测试工具。
+- **流程**：git worktree、提交、PR、审查与合并工具。
+- **技能**：编写技能的习惯、先修技能、提议建新技能。
 
-The **poteto-mode** skill shows the shape. Read it for granularity. Don't copy its content. The user's rules are not the same as poteto-mode's.
+**poteto-mode** 技能展示了形态。读它学颗粒度。不要抄它的内容。用户的规则跟 poteto-mode 的不一样。
 
-### 4. Draft the skill
+### 4. 起草技能
 
-Use Hermes Agent's built-in `create-skill` skill to author the skill. Placement:
+用 Hermes Agent 内置的 `create-skill` 技能来编写。放置位置：
 
-- Path: preserve an existing mode skill's category. For a new mode, use `Hermes profile skills directory<handle>/<handle>-mode/SKILL.md` when the repo has an established personal category for that handle. Otherwise default to `Hermes profile skills directory<handle>-mode/SKILL.md` in the project (or `~/Hermes profile skills directory<handle>-mode/` if the user prefers a personal skill).
-- Handle: the user's first name or chosen identifier.
-- Frontmatter `description`: trigger on their name + `/<handle>-mode` + "work in their style", not on generic keywords like "write code" or "review PR".
-- Frontmatter formatting: follow `create-skill`'s YAML rules. Keep `description` as one YAML scalar. Quote it or use `description: >-` with indented continuation lines when punctuation or wrapping requires it.
-- Frontmatter `disable-model-invocation: true` by default. Opt out only if the user explicitly wants their mode to apply on every turn.
+- 路径：现有 mode 技能的分类保持不变。新建 mode 时，如果仓库已经为这个 handle 建了个人分类，用 `Hermes profile skills directory<handle>/<handle>-mode/SKILL.md`。否则默认用项目里的 `Hermes profile skills directory<handle>-mode/SKILL.md`（用户更想要个人技能时用 `~/Hermes profile skills directory<handle>-mode/`）。
+- Handle：用户的名字或他选定的标识。
+- frontmatter 的 `description`：触发条件是他的名字加 `/<handle>-mode` 加「按他的风格干活」，不是「写代码」「审 PR」这类通用关键词。
+- frontmatter 格式：遵守 `create-skill` 的 YAML 规则。`description` 保持为一个 YAML 标量。标点或换行有需要时，加引号，或者用 `description: >-` 配缩进续行。
+- frontmatter 默认 `disable-model-invocation: true`。只有用户明确希望他的 mode 每一轮都生效时才关掉。
 
-### 5. Iterate on prose
+### 5. 打磨文字
 
-Apply the **unslop** skill and `create-skill`'s writing guidelines to every line.
+对每一行套用 **unslop** 技能和 `create-skill` 的写作指南。
 
-Show the draft to the user and take feedback. Expect multiple iterations. Cut ruthlessly. A mode skill is not a manual.
+把草稿给用户看，收反馈。预期要来回好几轮。狠心删。mode 技能不是说明书。
 
-### 6. Land it
+### 6. 落地
 
-Work in a worktree off main. Commit and open a PR. Don't push to main directly.
+在从 main 切出的 worktree 里干活。提交并开 PR。不要直接推 main。
 
-## Guardrails
+## 约束
 
-- **Don't overfit to one conversation.** A preference stated once and contradicted another time is noise. Require multiple instances before codifying it.
-- **Don't be clever.** Restating other skills' contents, inventing metaphors, or writing "poetic" prose for an agent reader is cost without benefit. Keep it operational.
-- **Reference, don't inline.** Other skills the user relies on should appear as path references, not pasted excerpts. Same for any principle docs they maintain elsewhere.
-- **Keep sections minimal.** Only add a section if the user has a specific, non-default rule there. "Communicate clearly" is not a section. "Short paragraphs. Tables when comparing options. Bullets only when items are genuinely parallel." is.
-- **Name conventions generic.** Use "the user" or "the human" in imperatives, not the author's first name.
-- **Don't force symmetry.** If a user has no process rules worth writing down, skip the Process section entirely.
+- **不要过拟合到一次对话。** 说过一次、另一次又被推翻的偏好是噪声。要多次出现才写成规则。
+- **不要耍聪明。** 复述别的技能的内容、发明隐喻、为代理读者写「诗意」文字，都是只有成本没有收益。保持可执行。
+- **引用，不要内联。** 用户依赖的其他技能应当以路径引用出现，不是粘贴片段。他在别处维护的原则文档也一样。
+- **小节保持最少。** 只有用户在那里有一条具体的、非默认的规则时才加小节。「沟通清晰」不是一个小节。「段落要短。比较选项时用表格。只有条目确实并列时才用无序列表。」才是。
+- **惯例写成通用的。** 命令句里用「用户」或「人」，不用作者的名字。
+- **不要强行对称。** 用户没有值得写下来的流程规则，就整节跳过流程。
 
-## Evaluation
+## 评估
 
-A `-mode` skill is subjective output. A `create-skill`-style test/iterate benchmark loop isn't useful here. Vibe-check with the user: does it read like them? Did it miss anything? Then ship.
+`-mode` 技能是主观产出。`create-skill` 那种测试与迭代的基准循环在这里没用。跟用户对一下感觉：读起来像他吗？漏了什么吗？然后就发布。
 
-Run a description-optimization loop only if the skill's trigger accuracy turns out to be a problem in practice.
+只有当这个技能的触发准确率在实践中确实成了问题，才跑 description 优化循环。
 
-## When not to use
+## 什么时候不用
 
-- User wants a task-specific skill (not working conventions): `create-skill` alone, no mining required.
-- User wants to capture one narrow workflow (e.g. "how I write commit messages"). That's a regular skill, not a mode skill.
-
+- 用户想要一个针对具体任务的技能（不是工作惯例）：只用 `create-skill`，不需要挖掘。
+- 用户想记下一个很窄的流程（例如「我怎么写提交信息」）。那是普通技能，不是 mode 技能。

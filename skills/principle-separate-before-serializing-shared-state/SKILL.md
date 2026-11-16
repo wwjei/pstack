@@ -1,6 +1,6 @@
 ---
 name: principle-separate-before-serializing-shared-state
-description: "Apply when concurrent actors may write the same state."
+description: "并发执行体可能写同一状态时应用."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,13 +11,13 @@ metadata:
     related_skills: []
 ---
 
-# Separate Before Serializing Shared State
+# 共享状态先分离，再谈串行化
 
-When concurrent actors might share mutable state, first ask whether they need the same mutable object. If not, eliminate the sharing. When sharing is real, enforce serialization structurally: lockfiles, sequential phases, exclusive ownership. Instructions and conventions are not concurrency control.
+并发执行体可能共享可变状态时，先问它们是否需要同一个可变对象。不需要就消除共享。共享是真的时，用结构强制串行化，锁文件、顺序阶段、独占所有权。指示和约定不是并发控制。
 
-**Why:** Concurrent writes to shared state create race conditions that are intermittent, hard to reproduce, and expensive to debug.
+**为什么。** 对共享状态的并发写造成竞态条件，时隐时现，难复现，调试代价高。
 
-**Pattern:**
-1. **Identify shared mutable state** (files both read and write, branches both push to, APIs both define and consume).
-2. **Default: eliminate the shared write target.** Ask: do these actors need one canonical object, or are they publishing independent facts? Give each actor its own owned file, key, branch, or state directory, and merge only at the read/reporting boundary. Two workers writing their own `lastX` field into one `state.json` is still shared mutation. `indexer-state.json` + `metrics-state.json` is not.
-3. **Only when one shared write target is a real invariant, serialize access structurally** (lockfiles, sequential phases, single-writer actor, or atomic compare-and-swap). Treat "we need a lock" as a design smell to check, not as the default answer.
+**模式。**
+1. **识别共享可变状态**（两边都读写的文件、两边都推的分支、两边既定义又消费的 API）。
+2. **默认消除共享的写目标。** 问，这些执行体需要一个权威对象，还是在发布各自独立的事实？给每个执行体自己拥有的文件、键、分支或状态目录，只在读取/汇报边界合并。两个子代理各写自己的 `lastX` 字段进同一个 `state.json`，仍然是共享改动。`indexer-state.json` 加 `metrics-state.json` 就不是。
+3. **只有当一个共享写目标是真实的不变量时，才用结构串行化访问**（锁文件、顺序阶段、单写者执行体，或原子比较并交换）。把「我们需要一把锁」当作要检查的设计坏味道，不是默认答案。

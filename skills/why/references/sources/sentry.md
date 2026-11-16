@@ -1,100 +1,100 @@
-# Sentry Error History
+# Sentry 错误历史
 
-## What this source contains
+## 这个来源里有什么
 
-Sentry is the archive of things that went wrong. For defensive, corrective, or error-handling code, it often holds the direct motivation: the specific exceptions, stack traces, and frequencies that pushed someone to add a check, catch, retry, or fallback.
+Sentry 是出过什么事的档案库。对防御性、纠正性或错误处理代码，它常常存着直接动机，就是逼着某人加检查、捕获、重试或兜底的那些具体异常、堆栈和频率。
 
-- **Issues.** Grouped errors with counts, first/last seen timestamps, affected releases, and comments
-- **Events.** Individual error instances within an issue (stack traces, tags, user context)
-- **Releases.** Deployment records with associated issues (useful for "which version fixed this?")
-- **Replays.** Session recordings of user-facing errors (if enabled)
-- **Profiles.** Performance profiling data (less useful for "why", more for "how slow")
-- **Issue comments & assignments.** Sometimes contain engineer notes on root cause
+- **问题（issue）。** 按组聚合的错误，带计数、首见/末见时间戳、受影响版本和评论
+- **事件。** 一个问题里的单个错误实例（堆栈、标签、用户上下文）
+- **发布。** 部署记录，带关联问题（适合「哪个版本修了它」）
+- **回放。** 用户侧错误的会话录制（若已启用）
+- **性能剖析。** 性能剖析数据（对「为什么」用处小，对「有多慢」用处大）
+- **问题评论与指派。** 有时带工程师关于根因的笔记
 
-The most valuable thing Sentry provides is **temporal correlation**: "issue X was created 2024-01-02, peaked at 500 events/day, stopped appearing after release v2.14.0 on 2024-01-15, the release that shipped the defensive check."
+Sentry 最有价值的东西是**时间相关性**。「问题 X 创建于 2024-01-02，峰值每天 500 个事件，2024-01-15 的 v2.14.0 发布后不再出现，那次发布正好带上了防御性检查。」
 
-## How to search it
+## 怎么搜
 
-Use the Sentry MCP.
+用 Sentry MCP。
 
-1. **Orient.** If you don't know the project slug and organization:
+1. **先摸清。** 不知道项目 slug 和组织时：
 
    ```
    find_organizations
    find_projects
    ```
 
-2. **Search for issues related to the target.**
+2. **搜与目标相关的问题。**
 
    ```
    search_issues (natural language, e.g., "errors in PaymentService timeout", "unhandled exceptions in uploadFile")
    ```
 
-   Good query components: exception class names the target handles, the function or class name of the target, error message strings the target checks for, the file path of the target.
+   好的查询成分有这些。目标处理的异常类名、目标的函数或类名、目标检查的错误消息字符串、目标的文件路径。
 
-3. **Narrow by release and time window.**
+3. **按版本和时间窗口收窄。**
 
    ```
    search_issue_events (filter by release, time, environment, trace ID, tags)
    get_issue_tag_values (for an issue, see distribution across versions, users, environments)
    ```
 
-   For a suspected issue, check:
-   - **First seen.** When did the error start appearing?
-   - **Last seen.** When did it stop? Does it line up with the target's ship date?
-   - **Affected releases.** Which versions saw it? Which was the fix?
-   - **Frequency trajectory.** Did it spike, then get resolved?
+   对疑似相关的问题，查：
+   - **首见。** 错误什么时候开始出现？
+   - **末见。** 什么时候停的？与目标的发布日期对得上吗？
+   - **受影响版本。** 哪些版本见过它？哪个版本修的？
+   - **频率走势。** 是否先飙升，然后被解决？
 
-4. **Pull the full event for context.**
+4. **拉完整事件看上下文。**
 
    ```
    get_sentry_resource (pass a Sentry URL or type+ID)
    ```
 
-   Does the stack trace pass through the target code? Do the tags and breadcrumbs match the conditions the target defends against?
+   堆栈穿过目标代码吗？标签和面包屑与目标防范的状况相符吗？
 
-5. **Check releases that landed near the target.**
+5. **查目标前后落地的发布。**
 
    ```
    find_releases (around the commit date of the target)
    ```
 
-   Cross-reference release version with the PR's merge date.
+   把发布版本与 PR 合并日期交叉核对。
 
-6. **Use Seer sparingly.**
+6. **少用 Seer。**
 
    ```
    analyze_issue_with_seer
    ```
 
-   Seer produces AI root-cause analyses. Useful as a hypothesis generator, but treat them as inference, not authoritative. The actual events and stack traces are the primary evidence. Seer's narrative is secondary.
+   Seer 产出 AI 根因分析。当假设生成器有用，但把它当推断，别当权威。真正的事件和堆栈才是一手证据。Seer 的叙述是二手的。
 
-## What good evidence looks like here
+## 这里的好证据长什么样
 
-- An issue whose **first seen** is shortly before the target's PR and **last seen** shortly after, suggesting the target addressed this error
-- Stack traces that pass through or land on the target function, showing the exact failure mode being defended against
-- A comment on the issue from the PR author describing the fix
-- The target's PR description or commit message referencing a Sentry issue URL or ID
-- An issue with high event counts that stops after the release containing the target
+- 一个问题的**首见**在目标 PR 前不久，**末见**在其后不久，提示目标处理了这个错误
+- 堆栈穿过或落在目标函数上，显示正被防范的确切失败模式
+- PR 作者在问题下描述修复的评论
+- 目标的 PR 描述或提交信息引用了 Sentry 问题的 URL 或 ID
+- 一个事件计数很高的问题，在包含目标的发布之后停了
 
-## Common pitfalls
+## 常见坑点
 
-- **Grouping drift.** Sentry groups errors by fingerprint. Refactors or renames can track the "same" error under a new issue ID. If an issue ends abruptly, the error may have just been regrouped. Check for new issues immediately after.
-- **Release correlation is noisy.** A release contains many commits. An issue stopping at v2.14.0 doesn't prove the target fixed it. Another change in the same release might have. Cross-reference with the target's exact commit.
-- **Silent fixes.** Sometimes the error stops because upstream changed, not because of the defensive code. The correlation suggests the fix. It doesn't prove authorship.
-- **Resolved != fixed.** Issues can be marked "resolved" manually without any code change. Treat `resolved` as a human marker, not evidence that code fixed it.
-- **Seer hallucinations.** Seer can generate confident-sounding explanations that aren't right. Fall back to the actual events, stack traces, and timestamps when making claims.
-- **Sampling.** Some projects sample events aggressively. A low event count may just mean high sampling, not a rare error. If in doubt, note the gap.
+- **分组漂移。** Sentry 按指纹给错误分组。重构或改名会让「同一个」错误挂到新的问题 ID 下。一个问题戛然而止，可能只是错误被重新分组。查紧随其后有没有新问题。
+- **发布相关性很吵。** 一次发布包含许多提交。问题停在 v2.14.0 不证明是目标修的。同一次发布里的别的改动也可能。与目标的确切提交交叉核对。
+- **无声的修复。** 有时错误停了是因为上游变了，不是防御性代码的功劳。相关性提示了修复，不证明出自谁手。
+- **标记已解决 != 真修好了。** 问题可以不改任何代码就手动标成 "resolved"。把 `resolved` 当人打的标记，不当代码修好了的证据。
+- **Seer 幻觉。** Seer 能生成听着自信却不对的解释。下论断时回到真实的事件、堆栈和时间戳。
+- **采样。** 有些项目对事件采样很狠。事件计数低可能只是采样力度大，不是错误罕见。拿不准就记下缺口。
 
-## What to return
+## 返回什么
 
-For each relevant issue:
-- Issue ID and title
-- Project and organization
-- First seen / last seen timestamps
-- Event count (and sampling rate if known)
-- Affected releases
-- A representative stack trace snippet showing relevance to the target (verbatim excerpt, not summary)
-- First/last-seen correlation with the target's ship date
-- Link to the issue
-- Any author comments or resolution notes
+每个相关问题，附上：
+- 问题 ID 与标题
+- 项目与组织
+- 首见 / 末见时间戳
+- 事件计数（知道采样率就附上）
+- 受影响版本
+- 一段能体现与目标相关性的代表性堆栈片段（逐字摘录，不是概括）
+- 首见/末见与目标发布日期的相关性
+- 问题链接
+- 作者评论或解决备注

@@ -1,25 +1,25 @@
-# Autonomous Run Playbook
+# 自主长跑操作手册
 
-**Trigger:** Long task, user stepping away. "Run until done", "going to bed", "finish this".
+**触发条件：** 长任务，用户要离开。「跑到做完为止」「我去睡了」「把这个做完」。
 
-## Steps
+## 步骤
 
-1. **State the exit condition as a checkable predicate.** Before starting, write it down explicitly: "Done when: all 47 migration files pass `pytest tests/migration/`" or "Done when: every `.jsx` file in `src/` uses the new import path and `npm test` passes." Vague goals ("make it better") get sent back to the user for clarification.
+1. **把退出条件写成可检查的判定条件。** 开工前明确写下来，「全部 47 个迁移文件通过 `pytest tests/migration/` 即完成」，或「`src/` 里每个 `.jsx` 文件都用新导入路径且 `npm test` 通过即完成」。含糊的目标（「让它更好」）退回给用户澄清。
 
-2. **Run the loop.** Each iteration:
-   - Make the **smallest change** the evidence justifies.
-   - Verify: does it advance toward the predicate? (`terminal` to run tests/checks.)
-   - **Commit if it advanced.** Discard and try differently if it didn't.
-   - Never make two unverified changes in a row.
+2. **跑循环。** 每轮迭代：
+   - 做证据撑得住的**最小改动**。
+   - 验证，它是否朝判定条件推进了？（用 `terminal` 跑测试和检查。）
+   - **推进了就 commit。** 没推进就丢弃，换个方式试。
+   - 绝不连续做两个未验证的改动。
 
-3. **Handle side discoveries that support the goal.** Broken tests, related bugs, flaky verifiers - fix them yourself as they appear. Don't log them for later; they'll block the predicate if you ignore them. Keep fixes in separate commits.
+3. **处理支持目标的顺带发现。** 坏掉的测试、相关的 bug、时好时坏的验证器，一出现就自己修掉。别记下来留到以后，放着不管它们会挡住判定条件。修复放在单独的 commit 里。
 
-4. **Checkpoint every iteration.** After each commit, re-evaluate: how many units remain? Is the approach still converging? If you've made 3 iterations with no progress, step back and reassess the approach - don't keep grinding the same wall.
+4. **每轮迭代设检查点。** 每次 commit 后重新评估，还剩几个单元？方法还在收敛吗？连续 3 轮迭代没有进展，就退一步重新评估方法，别对着同一堵墙硬磨。
 
-5. **Stop when the predicate is met.** Run the full check one final time. Report: what was done, how many iterations, what side-fixes were needed.
+5. **判定条件满足就停。** 最后完整跑一次检查。汇报做了什么、跑了几轮迭代、需要哪些顺带修复。
 
-**Plateau is not a stop.** If you're stuck, change approach - different decomposition, different order, ask `pstack:interrogate` to challenge your assumptions. Only stop for: predicate met, or a blocker that genuinely requires user input (credentials, ambiguous requirements, external service down).
+**平台期不是停止理由。** 卡住就换方法，换分解方式、换顺序、请 `pstack:interrogate` 挑战你的假设。只有两种情况才停，判定条件满足，或碰到真正需要用户输入的阻塞（凭据、含糊的需求、外部服务宕机）。
 
-## Key Rule
+## 关键规则
 
-Define done as a falsifiable predicate before starting. Every iteration either advances toward it (commit) or teaches you something (try differently). No open-ended wandering.
+开工前把完成定义成可证伪的判定条件。每轮迭代要么朝它推进（commit），要么教会你点什么（换个方式试）。不许漫无目的地游荡。

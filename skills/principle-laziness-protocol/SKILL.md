@@ -1,6 +1,6 @@
 ---
 name: principle-laziness-protocol
-description: "Apply when refactoring or tempted to add more code."
+description: "重构或想再加代码时应用."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,15 +11,15 @@ metadata:
     related_skills: []
 ---
 
-# Laziness Protocol
+# 懒惰协议
 
-Aim for the most result with the least code and complexity.
+用最少的代码和复杂度，拿最大的结果。
 
-- **Prefer deletion.** When asked to refactor or improve, look for removals before additions.
-- **Maintain a flat call hierarchy.** Avoid deep call chains. A rich interface that hides substantial work is not a deep call chain. If answering a question requires tracing through more than 3 files or layers, flatten it.
-- **Consolidate decisions.** Do not repeat the same choice in several places. Put it behind one source of truth and pass the result as a simple flag.
-- **Minimize the diff.** Make the smallest change that solves the problem. Fewer lines beat "elegant" boilerplate.
-- **Question the threading.** If a task asks you to pass a new signal through types, schemas, pipelines, or similar layers, stop and look for a more direct path.
-- **Sweat the small leaks.** Remove tiny pass-throughs, representation leaks, and duplicated choices before they spread. Small leaks compound into permanent coordination costs.
+- **倾向于删。** 被要求重构或改进时，先找能删的，再找能加的。
+- **保持扁平的调用层级。** 避免深调用链。一个藏了大量工作的丰富接口不是深调用链。回答一个问题要穿过 3 个以上文件或层，就压扁它。
+- **合并决策。** 同一个选择不要在几个地方重复做。把它放到一个单一事实来源后面，把结果当一个简单标记传下去。
+- **最小化 diff。** 做能解决问题的最小改动。更少的行胜过「优雅」的样板代码。
+- **质疑层层传递。** 任务要你把一个新信号穿过类型、数据模式、管道或类似的层，停下来，找更直接的路。
+- **盯住小泄漏。** 微小的透传、表示泄漏、重复的选择，趁没扩散先清掉。小泄漏会累积成永久的协调成本。
 
-**The test:** If a human developer would find the code exhausting to maintain, it is a bad solution.
+**检验：** 一个人类开发者会觉得这代码维护起来累人，它就是个坏方案。

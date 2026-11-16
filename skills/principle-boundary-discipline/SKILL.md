@@ -1,6 +1,6 @@
 ---
 name: principle-boundary-discipline
-description: "Apply when placing validation or error handling in code."
+description: "在代码里安放校验或错误处理时应用."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,31 +11,31 @@ metadata:
     related_skills: []
 ---
 
-# Boundary Discipline
+# 边界纪律
 
-Place validation, type narrowing, and error handling at system boundaries. Trust internal code unconditionally. Business logic lives in pure functions. The shell is thin and mechanical.
+把校验、类型收窄和错误处理放在系统边界。无条件信任内部代码。业务逻辑放在纯函数里。外壳要薄，要机械。
 
-**Why:** Scattered validation is noisy, redundant, and gives a false sense of safety. Keep logic out of framework wiring so it can be tested without the framework.
+**为什么：** 散落的校验又吵又冗余，还给人虚假的安全感。把逻辑从框架接线里拿出来，才能不依赖框架去测试它。
 
-**The pattern:**
-- **At boundaries** (CLI args, config files, external APIs, network protocols): validate, return errors, handle defensively.
-- **Inside the system:** typed data, error propagation, no re-validation. Trust the types.
-- **Across the boundary.** Expose domain concepts, not the boundary's private representation. Keep general-purpose mechanism inside and special-purpose policy at the edge.
+**模式：**
+- **在边界上**（CLI 参数、配置文件、外部 API、网络协议），校验，返回错误，防御式处理。
+- **在系统内部：** 带类型的数据，错误传播，不重复校验。信任类型。
+- **跨过边界。** 暴露领域概念，不是边界的私有表示。通用机制留在内部，专用策略放在边缘。
 
-**Applications:**
+**应用：**
 
-Validation and error handling:
-- Validate config at parse time (the boundary), not inside business logic
-- Parse raw data into domain types at the boundary
-- Do not re-export transport, storage, framework, or wire types through the public surface
-- No redundant nil checks deep in call chains if the boundary already validated
+校验与错误处理：
+- 在解析时（边界）校验配置，不在业务逻辑里
+- 在边界把原始数据解析成领域类型
+- 不把传输、存储、框架或报文类型经公开接口再导出
+- 边界已经校验过的，调用链深处不做冗余的空值检查
 
-Code organization:
-- Business logic in pure functions with no framework dependencies
-- Parse functions: pure transforms from raw bytes to typed state
-- Prompt construction: structured state in, string out
-- Scoring and assessment: pure transforms from state to results
+代码组织：
+- 业务逻辑放在不依赖框架的纯函数里
+- 解析函数，从原始字节到带类型状态的纯变换
+- 提示词构造，输入结构化状态，输出字符串
+- 打分与评估，从状态到结果的纯变换
 
-**The tests:**
-- "Is this data crossing a system boundary right now?" If not, validation is redundant.
-- "Can this be a pure function that the shell just calls?" If yes, extract it.
+**检验：**
+- 「这份数据此刻正在跨系统边界吗？」不是的话，校验就是冗余。
+- 「这能不能做成一个纯函数，外壳只管调用？」能的话，抽出来。

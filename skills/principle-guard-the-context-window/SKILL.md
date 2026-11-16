@@ -1,6 +1,6 @@
 ---
 name: principle-guard-the-context-window
-description: "Apply when context fills with large outputs or files."
+description: "上下文被大输出或大文件填满时应用."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,13 +11,13 @@ metadata:
     related_skills: []
 ---
 
-# Guard the Context Window
+# 守住上下文窗口
 
-The context window is finite and non-renewable within a session. Every token should be worth its cost.
+上下文窗口有限，在一个会话内不可再生。每个 token 都应当值回它的成本。
 
-**Why:** Context overflow degrades reasoning quality, creates compression artifacts, and halts progress.
+**为什么：** 上下文溢出会降低推理质量，制造压缩失真，并让进度停摆。
 
-**Pattern:**
-- **Isolate large payloads.** Route verbose outputs, screenshots, and large documents to subagents. The main context gets summaries, not raw data.
-- **Keep frequently used content inline.** Templates and references used on every invocation belong in the skill file, not in separate files that cost a read each time.
-- **Size phases and cap scope.** Limit files per phase, set turn budgets, account for mechanism costs.
+**模式：**
+- **隔离大负载。** 把冗长的输出、截图、大文档路由给子代理。主上下文拿摘要，不拿原始数据。
+- **常用内容留在行内。** 每次调用都要用的模板和参考资料属于技能文件本身，不是单独的文件，那样每次都要花一次读取。
+- **给阶段定尺寸，给范围封顶。** 限制每个阶段的文件数，设轮次预算，把机制本身的成本算进去。

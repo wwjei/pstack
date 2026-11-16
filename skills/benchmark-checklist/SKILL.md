@@ -1,6 +1,6 @@
 ---
 name: benchmark-checklist
-description: Vet benchmark evidence before reporting a result.
+description: 汇报结果前先核验基准证据.
 version: 1.0.0
 author: poteto (original Cursor plugin)
 license: MIT
@@ -13,4 +13,4 @@ metadata:
 
 # Benchmark checklist
 
-Before reporting a benchmark, verify the limiter, tuning, limits, errors, repeatability, relevance, and that the work happened. Use the detailed checklist in the upstream pstack documentation as operational guidance. Record the run count, spread, limiter, and evidence with every number.
+汇报一个基准之前，核验限制因素、调优、极限、错误、可重复性、相关性，以及那个工作真的发生了。把上游 pstack 文档里的详细清单当作操作指引。每个数字都记下运行次数、离散程度、限制因素和证据。

@@ -1,36 +1,36 @@
-### Opening a PR
+### 开 PR
 
-Invoked at the end of every other playbook.
+其他每本操作手册结束时都会调用它。
 
-**Worktree.** Work from a git worktree off main. Subagents inherit it. Multiple `Task` calls on the same branch each get their own worktree, or `git fetch && git reset --hard origin/<branch>` between them. Dirty branch with unrelated work: patch out, fresh worktree, apply. Snarled worktree: reset from main, redo minimally.
+**工作树。** 在从 main 拉出的 git 工作树里干活。子代理继承它。同一分支上的多次 `Task` 调用各拿一个工作树，或者在两次调用之间跑 `git fetch && git reset --hard origin/<branch>`。分支脏了、带着无关改动：导出补丁，开新工作树，再打上。工作树乱成一团：从 main 重置，最小化重做。
 
-**Commits.** Commit liberally. Rebase into small, ordered commits before opening PRs. Each commit is a future PR: landable, ordered to tell the story. Amend when the fix belongs in a just-made commit. New commit when separable.
+**提交。** 放开提交。开 PR 之前 rebase 成小而有序的提交。每个提交都是一个未来的 PR：能落地，排序能讲出故事。修复属于刚做的提交就 amend。能分开就新开提交。
 
-**PRs.** Run `pstack:deslop` over the diff before commit. Run `/no-comments` before review. Write every PR title, PR description, and commit body with `/technical-writing`, then apply `/unslop`. Apply every technical-writing layer except Diátaxis. Use one word for each action, keep articles, and avoid `-ing` when a plain verb works.
+**PR。** 提交前对 diff 跑 `pstack:deslop`。审查前跑 `/no-comments`。每个 PR 标题、PR 描述、提交正文都用 `/technical-writing` 写，再套 `/unslop`。technical-writing 的各层全用，只有 Diátaxis 除外。每个动作用一个词，保留冠词，普通动词够用时避免 `-ing`。
 
-**Titles.** Use Conventional Commits in the form `type(scope): subject`. Use `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, or `perf` as the type. Use the changed area, such as `pstack` or `poteto-mode`, as the scope. Keep the subject short and imperative. Name a real symbol when one carries the change. For example, `fix(pstack): retarget opening-a-pr babysit trigger`. Do not add a trailing period.
+**标题。** 用 Conventional Commits，格式 `type(scope): subject`。type 用 `feat`、`fix`、`docs`、`refactor`、`test`、`chore` 或 `perf`。scope 用改动的区域，比如 `pstack` 或 `poteto-mode`。主题行短小，用祈使语气。有承载改动的真实符号就点名它。例如 `fix(pstack): retarget opening-a-pr babysit trigger`。末尾不加句点。
 
-**Descriptions.** The PR body is a briefing, not the lab notebook. A reviewer who has the diff should learn why the change exists, what it leaves out, what it could break, and how you proved it works, in under a minute. Write short, simple sentences with few identifiers. Do not write walls of text. The squash commit body is the PR body. If the body would make the squash commit longer than about 40 lines, cut the body.
+**描述。** PR 正文是简报，不是实验记录本。拿着 diff 的审查者应该在一分钟内弄清改动为什么存在、漏了什么、可能弄坏什么、你怎么证明它能用。写短而简单的句子，少用标识符。不要写文字墙。squash 提交的正文就是 PR 正文。正文会让 squash 提交超过约 40 行，就砍正文。
 
-Put each section under a `##` heading, not a bold lead-in, so the sections stand apart. Use these sections in order. Drop a section when it has nothing to say.
+每节放在 `##` 标题下，不用加粗引语，让各节分开。按顺序用下面这些节。没话说的节就删掉。
 
-- `## Why` gives the problem and the approach in one to three short sentences. Do not list SHAs or rebase genealogy. Do not add a "based on main" preamble.
-- `## What changed` has one to three short bullets. Name a real symbol or path only when it carries the change. Name both sides of a rename or retarget.
-- `## Scope` always names what the PR covers and what it deliberately leaves out, for example a related follow-up or a known gap. Use one to three short items. Do not list symbols or paths, and do not write a file-by-file essay.
-- `## Tradeoffs` names only rejected alternatives that a reviewer would otherwise ask about. Skip this section when there was no real choice.
-- `## Blast Radius` gives one or two sentences on who or what the change touches and why that is safe or risky. If main is red, state the cost of leaving it red.
-- `## Verification` has one to three bullets. Each bullet names a real run path and its outcome. For a performance change, report one primary number with its unit in `before → after` form. Link the arena or swarm directory for the remaining evidence. Do not include sample-size methodology, swarm recitals, or metric tables.
+- `## Why` 用一到三个短句给出问题和做法。不要列 SHA 或 rebase 谱系。不要加「based on main」开场白。
+- `## What changed` 一到三条短要点。只有承载改动时才点名真实符号或路径。改名或改目标分支要点出两边。
+- `## Scope` 永远点明 PR 覆盖什么、刻意不做什么，比如相关的后续 PR 或已知缺口。一到三条短条目。不列符号或路径，不写逐文件长文。
+- `## Tradeoffs` 只点那些不写审查者就会问的被否方案。没有真正的取舍就跳过这节。
+- `## Blast Radius` 用一两句话说清改动碰到谁或什么，为什么安全或有风险。main 红着的话，说清让它继续红着的代价。
+- `## Verification` 一到三条要点。每条点名一条真实运行路径及其结果。性能改动报一个带单位的主数字，用 `before → after` 形式。其余证据链接 arena 或 swarm 目录。不放样本量方法论、swarm 流水账或指标表。
 
-After these sections, attach videos or screenshots when they prove a claim. Do not paste full SHAs, swarm or arena lane recitals, lever-correction essays, file-by-file checklists, or "CLEAN" verdicts. Put these details in a linked artifact. A commit body does not restate its subject.
+这些节之后，视频或截图能证明论断就附上。不要贴完整 SHA、swarm 或 arena 泳道流水账、杠杆修正长文、逐文件清单或「CLEAN」结论。这些细节放进链接的产物里。提交正文不复述主题行。
 
-**Forge.** Resolve the forge before the first PR operation and keep that choice for create, edit, view, watch, and merge. GitHub CLI (`gh`) is the default. If `command -v origin` succeeds and Origin can resolve the repository, prefer `origin pr ...`. If Origin is absent or cannot resolve the repository, stay on `gh` and record the fallback. Do not require Graphite (`gt`).
+**托管平台。** 第一次 PR 操作之前定下托管平台，创建、编辑、查看、监视、合并都沿用这个选择。默认 GitHub CLI（`gh`）。`command -v origin` 成功且 Origin 能解析这个仓库时，优先 `origin pr ...`。Origin 不在或解析不了仓库，就留在 `gh`，记下这次回退。不要求 Graphite（`gt`）。
 
-**Built-in PR tool.** When the run provides a built-in PR tool, create, edit, retarget, and mark ready through it, never through a forge CLI. Its own instructions say how. A PR made with the CLI misses what the tool tracks, such as a description later runs can edit. Use the resolved forge for everything the tool does not cover, and for every PR operation when the run has no such tool.
+**内置 PR 工具。** 运行环境提供内置 PR 工具时，创建、编辑、改目标分支、标就绪都走它，绝不走托管平台 CLI。怎么用，它自己的说明里有。用 CLI 建的 PR 会漏掉工具跟踪的东西，比如后续运行可以编辑的描述。工具覆盖不到的都用定下的托管平台，运行环境没有这种工具时所有 PR 操作都走托管平台。
 
-**Size and stacks.** Prefer five narrow PRs to one large PR. A stack is a base-branch chain. The root PR targets trunk. Each child branch rebases onto its parent's exact tip and its PR targets the parent branch. Without a built-in PR tool, create a child with `origin pr create --status open --base <parent-branch>` or `gh pr create --base <parent-branch>` according to the resolved forge, and retarget an existing child with `origin pr edit <pr> --base <parent-branch>` or `gh pr edit <pr> --base <parent-branch>`. Branch from trunk only for independent work. Rebase on trunk before substantial stack work.
+**大小与堆叠。** 宁要五个窄 PR，不要一个大 PR。堆叠是一条基分支链。根 PR 指向主干。每个子分支 rebase 到父分支的确切顶端，它的 PR 指向父分支。没有内置 PR 工具时，按定下的托管平台用 `origin pr create --status open --base <parent-branch>` 或 `gh pr create --base <parent-branch>` 建子 PR，用 `origin pr edit <pr> --base <parent-branch>` 或 `gh pr edit <pr> --base <parent-branch>` 给已有子 PR 改目标分支。只有独立工作才直接从主干开分支。大量堆叠工作之前先 rebase 到主干。
 
-**Readiness.** Open every PR ready, never as a draft. A built-in PR tool can default to draft, so set `draft: false` on every creation call through it. With Origin, pass `--status open`. With `gh`, omit `--draft`. If a PR still opens as a draft, mark it ready through the PR tool, or run `origin pr ready <number>` or `gh pr ready <number>` according to the resolved forge. Run `origin pr view <number>` or `gh pr view <number>` before you refer to PR status.
+**就绪。** 每个 PR 都开成就绪，绝不开成草稿。内置 PR 工具可能默认草稿，所以每次通过它创建都设 `draft: false`。Origin 传 `--status open`。`gh` 不带 `--draft`。PR 还是开成了草稿，就通过 PR 工具标就绪，或按定下的托管平台跑 `origin pr ready <number>` 或 `gh pr ready <number>`。提到 PR 状态之前先跑 `origin pr view <number>` 或 `gh pr view <number>`。
 
-**Babysit.** Opening a PR does not start a babysit. Post the URL and keep building. Finish the phase or stack first. Run a separate babysit pass only when the user asks for one after the whole stack exists. A babysit for each new PR stalls the build and spends checks on commits that later waves restart. Push back when feedback drifts from intent.
+**盯跑。** 开 PR 不启动盯跑。贴出 URL，继续构建。先做完阶段或堆叠。只有整个堆叠存在之后用户开口要，才单独跑一轮盯跑。每个新 PR 都盯跑会拖住构建，把检查花在后续波次会重启的提交上。反馈偏离意图就顶回去。
 
-A subagent that opens a PR runs `pstack:deslop` and `/no-comments`, and posts the URL. Then it returns to the parent without babysitting, unless it is an Autopilot-full or Autopilot-stack owner. That owner's brief assigns the babysit loop and is the ask `playbooks/babysit.md` waits for. The owner starts the loop after its code-ready report and reports merge-ready. The rules here and in `playbooks/babysit.md` that hold babysitting until a whole stack is built do not apply to that owner.
+开 PR 的子代理跑 `pstack:deslop` 和 `/no-comments`，贴出 URL。然后不盯跑，直接返回父级，除非它是 全自动驾驶 或 堆叠自动驾驶 的所有者。那个所有者的任务说明里指派了盯跑循环，正是 `playbooks/babysit.md` 等的那个请求。所有者在代码就绪报告之后启动循环，并报告合并就绪。这里和 `playbooks/babysit.md` 里那些要求整个堆叠建好才盯跑的规则，对那个所有者不适用。

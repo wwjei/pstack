@@ -1,6 +1,6 @@
 ---
 name: principle-foundational-thinking
-description: "Apply before writing logic: pick core types and data first."
+description: "写逻辑之前应用，先定核心类型与数据."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,18 +11,18 @@ metadata:
     related_skills: []
 ---
 
-# Foundational Thinking
+# 地基式思考
 
-**Structural decisions** protect option value. **Code-level decisions** protect simplicity.
+**结构性决策**保护选择权。**代码级决策**保护简单。
 
-**Data structures first.** Get the data shape right before writing logic. Define core types early, trace every access pattern, and choose structures that match the dominant paths.
+**先数据结构。** 写逻辑之前先把数据形状弄对。尽早定义核心类型，追每一种访问模式，选匹配主导路径的结构。
 
-At code level, DRY the structure, not every line. Types and data models should converge. Three similar statements still beat a premature abstraction. Prefer explicit over clever. Test behavior and edge cases, not line counts.
+代码层面，按 DRY（不要重复自己）收敛结构，不是每一行都去重。类型和数据模型应当收敛。三条相似的语句仍然胜过过早的抽象。显式优于聪明。测行为和边界情况，不测行数。
 
-**Concurrency corollary.** Before sharing state between actors, ask "what happens if another actor modifies this concurrently?" If not "nothing", isolate.
+**并发推论。** 在多个执行体之间共享状态之前，问「另一个执行体同时改它会怎样？」答案不是「没事」，就隔离。
 
-**Scaffold first.** If something helps every later phase, do it first. Ask "does every subsequent phase benefit from this existing?" CI, linting, test infrastructure, and shared types are scaffold. Sequence for option value: setup before features, tests before fixes. Keep commits small and single-purpose.
+**先脚手架。** 一件事对后面每个阶段都有帮助，就先做。问「后面每个阶段都因为它存在而受益吗？」CI、lint、测试基础设施、共享类型都是脚手架。为选择权排序，搭建先于功能，测试先于修复。提交保持小，一次只干一件事。
 
-Each increment should land a coherent abstraction or deepen one that exists. Do not spread a new capability across callers as special-case coordination.
+每个增量都应当落下一个连贯的抽象，或加深一个已有的抽象。别把一个新能力摊成调用方之间的特判协调。
 
-Subtraction comes before scaffolding. Remove dead code first, then lay foundations.
+减法先于脚手架。先删死代码，再打地基。

@@ -1,6 +1,6 @@
 ---
 name: principle-explain-the-number
-description: "Apply before you measure, trust, or report a number."
+description: "测量、信任或汇报一个数字之前应用."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,21 +11,21 @@ metadata:
     related_skills: []
 ---
 
-# Explain the Number
+# 解释那个数字
 
-A measured number is a claim about a system. Before you trust it, report it, or act on it, find what limits it and rule out that it measured something else.
+一个测出来的数字是关于系统的一个论断。在你信任它、汇报它或据以行动之前，找出是什么在限制它，并排除它测到的是别的东西。
 
-**Why:** A run that went wrong still prints a plausible number. Requests that failed, a cache that skipped the work, code that never ran, a side left on default settings, and run-to-run noise all produce results that look fine. If you cannot say why the number is not twice as good, you do not know what you measured.
+**为什么：** 一次跑坏了的运行照样打印出一个像样的数字。失败的请求、跳过了工作的缓存、根本没跑的代码、留在默认设置的一侧、运行之间的噪声，都会产出看起来没问题的结果。如果你说不出这个数字为什么不能好一倍，你就不知道自己测的是什么。
 
-**Pattern:**
+**模式：**
 
-- **Write the decision before you run.** Name the result that would change a decision, and the noise floor. Stop when the run-to-run spread is larger than the effect.
-- **Ask "why not double?"** Name the resource or code path that bounds the result, such as a core, a lock, the disk, the network, or the load generator itself. Get it from a profile or from system counters taken during a run, then map it to source. A guess from reading the code is not a limiter.
-- **List what else the number could be measuring, and rule out each one with evidence.** The usual suspects are errors, skipped or cached work, an untuned side, noise, and a piece too small to matter end to end.
-- **Keep the evidence with the number.** Put the run count, the spread, and the limiter in the notes or a linked artifact, so a reader can check the claim.
+- **跑之前先写下决策。** 点名什么结果会改变决策，以及噪声底线。运行之间的离散程度大于效应时就停。
+- **问「为什么不是两倍？」** 点名限制结果的资源或代码路径，比如一个核、一把锁、磁盘、网络，或者负载生成器本身。从性能剖析或运行期间采的系统计数器里拿到它，再映射到源码。读代码猜出来的不算限制因素。
+- **列出这个数字还可能测到了什么，并用证据逐一排除。** 常见嫌疑是报错、被跳过或被缓存的工作、没调优的一侧、噪声，以及小到端到端无关紧要的一部分。
+- **证据跟数字放在一起。** 把运行次数、离散程度和限制因素写进笔记或一份链接的产物，让读者能核对这个论断。
 
-For a performance number, run the full procedure with the [benchmark-checklist](../benchmark-checklist/SKILL.md) skill. For an eval result, ask the same of the trials: did every run do the task, does the gap hold across trials and models, and does the scenario matter.
+性能数字，用 [benchmark-checklist](../benchmark-checklist/SKILL.md) 技能跑完整流程。评测结果，对每次试验问同样的问题，每次运行都做了任务吗，差距在多次试验和多个模型之间都成立吗，这个场景要紧吗。
 
-You skipped this when a run started without the result that would change a decision, when the evidence behind a number has no run count, no spread, or no named limiter, or when the time saved is larger than the time the changed piece took.
+出现这些情况就是你跳过了这条原则，运行开始时没写下会改变决策的结果，数字背后的证据没有运行次数、没有离散程度或没点名限制因素，或者省下的时间比被改的那部分本身花的时间还多。
 
-Distinct from [Prove It Works](../principle-prove-it-works/SKILL.md), which checks that an output is real. This checks that a measured number means what you say it means.
+不同于[证明它能用](../principle-prove-it-works/SKILL.md)，后者检查输出是真的。这条检查测出来的数字是不是你说的那个意思。

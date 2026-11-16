@@ -1,28 +1,28 @@
-# Investigation Playbook
+# 调查操作手册
 
-**Trigger:** "How does X work?", "Why was Y built this way?", "Should we do X or Y?"
+**触发条件：** 「X 是怎么工作的？」「Y 为什么造成这样？」「我们该做 X 还是 Y？」
 
-No code changes. No PR. Read-only answer.
+不改代码。不提 PR。只读的回答。
 
-## Steps
+## 步骤
 
-1. **Route through `pstack:how`** - pick the right mode:
-   - *Explain* for "how does X work" / "where does Y live"
-   - *Critique* for "should we do X or Y" / "is this approach sound"
+1. **经 `pstack:how` 路由**，选对模式：
+   - *讲解* 用于「X 是怎么工作的」/「Y 在哪里」
+   - *批判* 用于「我们该做 X 还是 Y」/「这个方案站得住吗」
 
-2. **Gather context** - `search_files` + `read_file` to trace the real flow end-to-end. Don't stop at the entry point; follow calls until the picture is complete. Use `web_search` / `web_extract` for external APIs or specs.
+2. **收集上下文**，用 `search_files` + `read_file` 端到端追真实流程。别停在入口，顺着调用走，直到图景完整。外部 API 或规格用 `web_search` / `web_extract`。
 
-3. **Structure the answer:**
-   - **Overview** - one paragraph, what it is and why it exists.
-   - **Key Concepts** - named things the reader must know (types, config knobs, protocols).
-   - **How It Works** - the actual flow, step by step, with file:line references.
-   - **Where Things Live** - table of files/modules and their role.
-   - **Gotchas** - non-obvious behavior, known limitations, easy mistakes.
+3. **组织回答：**
+   - **概览** - 一段话，它是什么，为什么存在。
+   - **关键概念** - 读者必须知道的有名有姓的东西（类型、配置旋钮、协议）。
+   - **怎么运作** - 真实流程，一步步走，带 file:line 引用。
+   - **东西都在哪** - 文件/模块及其职责的表格。
+   - **坑点** - 不明显的行为、已知局限、容易犯的错。
 
-4. **Apply `pstack:unslop`** - cut filler, hedging, and unrequested caveats. Every sentence earns its place with a fact or a file reference.
+4. **套用 `pstack:unslop`**，砍掉填充话、含糊其辞和没人要的告诫。每句话都得靠一个事实或一个文件引用挣得自己的位置。
 
-5. **Deliver** - the structured answer is the deliverable. No stubs, no TODOs, no "next steps" unless the user asked for a plan.
+5. **交付**，结构化的回答就是交付物。不留桩、不留 TODO、不写「下一步」，除非用户要的是计划。
 
-## Key Rule
+## 关键规则
 
-This is a read operation. If you find yourself wanting to fix something, stop. Note it in Gotchas and move on. The user asked a question, not for a patch.
+这是一次读操作。如果你发现自己想修点什么，停下。把它记进坑点，然后继续。用户问的是问题，不是要补丁。

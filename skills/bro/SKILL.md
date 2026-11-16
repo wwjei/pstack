@@ -1,6 +1,6 @@
 ---
 name: bro
-description: "Use to restate your last message in plain human words."
+description: "用大白话重述你的上一条消息."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,4 +11,4 @@ metadata:
     related_skills: []
 ---
 
-Restate your last message. Stop using jargon and speak coherently. State it more simply and concisely, like one human talking to another.
+重述你的上一条消息。别再用行话，把话说连贯。说得更简单、更简短，像一个人对另一个人说话那样。

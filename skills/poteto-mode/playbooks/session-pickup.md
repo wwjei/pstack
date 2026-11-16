@@ -1,11 +1,11 @@
-### Session pickup
+### 会话接续
 
-**You own the resume point. Read the prior trail, don't redo it.**
+**接续点由你负责。读先前的轨迹，别重做。**
 
-1. Locate the prior trail. Use the `session_search` tool, scoped to the current Hermes profile, to find the prior session (by query, or by `session_id` plus `around_message_id` to read context around a known point), a PR URL, or a pushed branch. Never read another profile's session data. Read the metadata overview and last messages first, then scan back for the decision points. Parse a long transcript in a subagent and keep the reduced timeline in the main thread (the **principle-guard-the-context-window** skill).
-2. Reconstruct operational state. The branch and worktree, what already landed (`git log`, `git diff` against the base), the open todos, the decisions made. The prior trail is authoritative input. Resist the bias to re-derive it.
-3. Diff done vs pending. Compare what shipped against what was planned, name the resume point, do not re-run the prior repro or redo completed work. A "let me verify from scratch" pass means you're treating the trail as untrustworthy when it's authoritative.
-4. Route the remaining work to the matching playbook and pick the verdict: continue the execution, ship a finished recommendation, ratify or override a prior conclusion, or postmortem a failed run. The pickup playbook ends here. The routed playbook owns the rest.
-5. Verify the inherited claims against the original goal on the real artifact (the **principle-prove-it-works** skill). A passing prior self-report is not the proof.
+1. 找到先前的轨迹。用 `session_search` 工具，范围限定在当前 Hermes profile，找先前的会话（按查询词，或用 `session_id` 加 `around_message_id` 读已知点附近的上下文）、一个 PR URL 或一个已推送的分支。绝不读别的 profile 的会话数据。先读元信息概览和最后几条消息，再往回扫决策点。长会话记录交给子代理解析，主线程只留压缩后的时间线（**principle-guard-the-context-window** 技能）。
+2. 重建运行状态。分支和 worktree、已经落地了什么（`git log`、对 base 的 `git diff`）、未完成的待办、已做的决策。先前的轨迹是权威输入。克制重新推导一遍的冲动。
+3. 比对已完成与待办。把已发布的对照计划，点名接续点，不要重跑先前的复现，也不要重做已完成的工作。「让我从头验证一遍」这种做法，等于把权威的轨迹当成不可信。
+4. 把剩余工作路由到匹配的操作手册，并选定结论，继续执行、发布一份已完成的建议、认可或推翻先前的结论，或对失败的运行做复盘。接续手册到此为止。剩下的归被路由到的手册负责。
+5. 在真实产物上，对照最初目标验证继承来的论断（**principle-prove-it-works** 技能）。先前自述的通过不是证明。
 
-**Reply:** where the prior agent stopped, what you inherited vs redid (ideally nothing redone), the resume point, and the outcome.
+**回复：** 先前的代理停在哪，你继承了什么、重做了什么（最好什么都没重做），接续点，以及结果。

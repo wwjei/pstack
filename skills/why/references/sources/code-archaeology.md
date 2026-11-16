@@ -1,21 +1,21 @@
-# Code Archaeology (git + in-repo)
+# 代码考古（git 与仓库内）
 
-## What this source contains
+## 这个来源里有什么
 
-- Commit history (messages, dates, authors, diffs)
-- PR descriptions, review comments, and discussion threads (via `gh`)
-- Inline code comments, TODOs, FIXMEs, deprecation notes
-- ADRs (architectural decision records) if the repo keeps them
-- Tests. Names and assertions often encode the edge cases that motivated a change
-- Related files modified in the same commits (co-change signal)
-- CHANGELOG entries, release notes in the repo
-- Issue/ticket IDs mentioned in commit messages and PR bodies
+- 提交历史（提交信息、日期、作者、diff）
+- PR 描述、审查评论和讨论串（通过 `gh`）
+- 代码内注释、TODO、FIXME、弃用说明
+- ADR（架构决策记录），如果仓库有保留
+- 测试。测试名和断言常常编码了促成一次改动的边界情况
+- 同一批提交里一起改的相关文件（共同变更信号）
+- CHANGELOG 条目、仓库内的发布说明
+- 提交信息和 PR 正文里提到的议题/工单 ID
 
-The most trustworthy source, tied directly to the code, and the most complete. Everything that went through the repo should be here.
+最可信的来源，直接绑在代码上，也最完整。凡是经过仓库的东西都应该在这里。
 
-## How to search it
+## 怎么搜
 
-Expand the seed commit list:
+扩展种子提交清单：
 
 ```bash
 # Full history of the file through renames
@@ -37,7 +37,7 @@ git show <hash>
 git log <old>..<new> -p -- <file>
 ```
 
-For each substantive commit, pull the PR context:
+对每个实质性提交，拉出 PR 背景：
 
 ```bash
 # Find the PR number from the merge commit or branch
@@ -49,7 +49,7 @@ gh pr view <number> --json title,body,author,createdAt,mergedAt,labels,closingIs
 # The --json reviews and comments fields are where the real signal is
 ```
 
-Look for out-of-band docs:
+找一找散落在代码之外的文档：
 
 ```bash
 # ADRs often live in docs/adr/ or similar
@@ -62,27 +62,27 @@ rg -n -C2 '(TODO|FIXME|HACK|XXX|NOTE)' <target_file>
 rg -l '<symbol>' --glob '*test*'
 ```
 
-## What good evidence looks like here
+## 这里的好证据长什么样
 
-- A PR description that explains the problem being solved, not just the change ("This fixes the pagination bug that caused X")
-- A long review thread where alternatives were debated
-- An inline comment near the target line that explains a non-obvious constraint
-- A test named `test_handles_edge_case_when_X` that reveals an edge case motivating the code
-- A commit message that references a ticket or incident ID
-- A CHANGELOG entry that summarizes the user-visible rationale
+- 一份解释所解问题的 PR 描述，而不只是描述改动（「这修掉了导致 X 的分页缺陷」）
+- 一条辩论过备选方案的长审查讨论串
+- 目标行附近解释某个不显眼约束的代码内注释
+- 一个名为 `test_handles_edge_case_when_X` 的测试，揭示促成这段代码的边界情况
+- 一条引用工单或事故 ID 的提交信息
+- 一条总结用户可见理由的 CHANGELOG 条目
 
-## Common pitfalls
+## 常见坑点
 
-- **Squash-merge flatlands.** If the repo squashes PRs, individual commits in the branch history are lost. Fall back to PR body and comments.
-- **Misleading commit messages.** "Small refactor" sometimes hides an intentional behavior change. Look at the diff, not the message.
-- **Cargo-culted patterns.** The author may have copied a pattern without understanding why. Check if the pattern originated earlier in the codebase and investigate *that* commit.
-- **Bot commits and auto-merges.** Dependabot, Renovate, and automated backports usually don't carry motivation. Skip them when trying to find intent.
-- **Treating code as evidence of intent.** The code itself isn't evidence for why it exists. Evidence comes from commit messages, PRs, comments, tests, docs. Don't cite "the function is named X" as evidence of intent.
+- **压缩合并后的平地。** 仓库若对 PR 做压缩合并（squash merge），分支历史里的单个提交就没了。退回看 PR 正文和评论。
+- **误导性的提交信息。** 「Small refactor」有时藏着一次有意的行为变更。看 diff，别看信息。
+- **盲目照抄的模式。** 作者可能没弄懂为什么就抄了一个模式。查这个模式是否更早出现在代码库里，去调查*那个*提交。
+- **机器人提交与自动合并。** Dependabot、Renovate 和自动向后移植（backport）通常不带动机。找意图时跳过它们。
+- **把代码当成意图的证据。** 代码本身不是它为何存在的证据。证据来自提交信息、PR、注释、测试、文档。别拿「这个函数叫 X」当意图的证据。
 
-## What to return
+## 返回什么
 
-Every commit/PR/comment that bears on the question, with:
-- The exact text (quoted)
-- The hash / PR number / file:line
-- Author and date
-- Whether it's direct (explicitly addresses the question) or circumstantial
+每个与问题相关的提交/PR/评论，附上：
+- 原文（照引）
+- 哈希 / PR 编号 / 文件:行号
+- 作者与日期
+- 是直接证据（明确回应了问题）还是间接证据

@@ -1,6 +1,6 @@
 ---
 name: recall
-description: "Use before resuming work to rebuild recent context."
+description: "开工或接续前重建最近的工作上下文."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -13,30 +13,30 @@ metadata:
 
 # Recall
 
-**Before you start or resume work, you rebuild the user's recent working context and hand back a tight capsule of where things stand now and what to do next.**
+**开工或接续工作之前，你重建用户最近的工作上下文，交回一份紧凑的状态胶囊，说清现在到哪一步、下一步做什么。**
 
-Keep it tight and on-topic. Read only what the in-scope threads need, then stop.
+保持紧凑、切题。只读范围内那些线索需要的东西，然后停。
 
-Your context lives in two records. Your own chat history holds what you did and decided. The shared record holds everything that happened around the same code under other names: the symptoms users keep reporting, the fixes that shipped and got reverted, the errors still firing in prod. That second record is what the **why** skill searches, across source control, the issue tracker, chat and issue channels, long-form docs, and error tracking. A feature with a long bug tail keeps most of its story there, so don't reconstruct it from your transcripts alone.
+你的上下文存在两份记录里。你自己的聊天历史装着你做过什么、定过什么。共享记录装着同一份代码周边、以别人名义发生的一切：用户反复报的症状、发布过又被回滚的修复、生产上还在报的错误。第二份记录正是 **why** 技能搜索的对象，横跨版本控制、工单系统、聊天与工单频道、长文档、错误追踪。一个拖着长长 bug 尾巴的功能，故事大半在那边，所以别只靠你自己的会话记录去重建它。
 
-Search your own chat history with the `session_search` tool: a query, or a `session_id` plus `around_message_id` to read context around a known message. It only reaches the current Hermes profile's session history, never another profile's.
+用 `session_search` 工具搜你自己的聊天历史：给一个查询，或者给 `session_id` 加 `around_message_id` 去读某条已知消息前后的上下文。它只够得着当前 Hermes profile 的会话记录，绝不到别的 profile。
 
-1. Classify, then route. One specific prior chat to resume is the `session-pickup` playbook, not this. Turning habits into a durable skill is `automate-me`. A human-readable summary of your work is a different task. Recall loads working context across recent chats before you act. If the user already gave you a full state capsule (paths, branch, the change), use it and skip the mining.
-2. Lock the scope before searching. Pin the window ("recent" is a real range, default the last 7 days), the topic if named, and the Hermes profile (default the active one. Never read another profile's sessions without being asked). State the scope back. Never quietly turn "all" into "recent N".
-3. Fan out across your chat history. Spawn parallel subagents on a fast, cheap model, each taking a slice of the window. Tell every subagent to query `session_search` with the topic, order candidates by recency, and read only the matching sessions and their relevant regions (`around_message_id`), skipping the current chat plus obvious noise (subagent, eval, and test chats). Each returns the same schema, one block per chat: topic, the user's goal, decisions, open threads, struggles and corrections, and artifacts (PRs, tickets, branches), each citing the session id. For one or two chats, skip the fan-out and search directly. The raw transcripts stay in the subagents. The main thread gets only their findings.
-4. Sweep the shared record whenever the topic names a feature, file, subsystem, area, or bug. This is the default, not a judgment call, and "my work on X" does not exempt it. Hand it to the **why** skill's source investigators, but steer their question from "why was this built this way" to "what's the current state, what's been tried and didn't hold, and what are users still reporting". Reuse its per-source playbooks, run the investigators in parallel with the chat-history mining, and inherit its posture: one investigator per source, null results are findings, skip an unavailable MCP and say so. Fold what comes back into the brief. Skip this step only for pure activity recall with no named target ("what did I do this week"), where your own history and live state are the entire answer.
-5. Verify against live state. Take the PRs, branches, and tickets that the mining and the sweep surfaced and check them with `git` and `gh`. When the answer hinges on what an agent actually did (the tools it ran, files it read, errors it hit), read the full transcript, not just a trimmed local copy.
-6. Write the brief to the contract below. Group by thread. Stay on the named topic.
+1. 先分类，再路由。要接续某一个具体的旧对话，那是 `session-pickup` 操作手册，不是这个。把习惯变成持久技能是 `automate-me`。给人看的工作总结是另一件事。Recall 是在你动手之前，跨最近的对话加载工作上下文。如果用户已经给了你一份完整的状态胶囊（路径、分支、改动），直接用，跳过挖掘。
+2. 搜之前先锁范围。钉死时间窗（「最近」是一个真实区间，默认最近 7 天）、点名了的话钉死主题、以及 Hermes profile（默认当前活跃的那个。没被要求就绝不读别的 profile 的会话）。把范围复述回去。绝不悄悄把「全部」变成「最近 N 条」。
+3. 跨聊天历史并行分发。用快而便宜的模型派并行子代理，每个拿时间窗的一个切片。告诉每个子代理：用主题查 `session_search`，候选按时间倒序排，只读匹配的会话及其相关区域（`around_message_id`），跳过当前这个对话以及明显的噪声（子代理、评测、测试类对话）。每个都按同一套 schema 返回，一个对话一块：主题、用户的目标、决策、未结的线索、卡住的地方与纠正、产物（PR、工单、分支），每一项都引会话 id。只有一两个对话时，跳过并行分发，直接搜。原始会话记录留在子代理那边。主线程只拿它们的发现项。
+4. 只要主题点名了某个功能、文件、子系统、领域或 bug，就扫一遍共享记录。这是默认动作，不是看情况判断，「我在 X 上的工作」也不豁免。把它交给 **why** 技能的各来源调查者，但把他们的问题从「当初为什么这么建」转向「现在是什么状态、试过什么没站住、用户还在报什么」。复用它按来源分的操作手册，让调查者跟聊天历史挖掘并行跑，并继承它的姿态：一个来源一个调查者，空结果也是发现项，MCP 不可用就跳过并说明。把回来的东西并进简报。只有一种情况跳过这一步：纯活动回溯、没有点名目标（「我这周做了什么」），这时你自己的历史加上实时状态就是全部答案。
+5. 对着实时状态核实。把挖掘和扫查翻出来的 PR、分支、工单，用 `git` 和 `gh` 查一遍。当答案取决于某个代理实际做了什么（跑了哪些工具、读了哪些文件、撞上什么错误），读完整会话记录，不是只读一份裁剪过的本地副本。
+6. 按下面的输出契约写简报。按线索分组。守住点名的主题。
 
-## Output contract
+## 输出契约
 
-Lead with the capsule, then the thread status, then the problems, then the next move. Deeper detail goes below or gets cut.
+先给状态胶囊，再给线索状态，再给问题，最后给下一步。更细的内容放下面，或者删掉。
 
-- **Capsule.** At most 5 bullets. What this work is and where it stands overall.
-- **Threads.** One line each, prefixed with exactly one status tag: `[merged #N]`, `[open PR #N]`, `[in flight <branch>]`, `[verified, uncommitted]`, `[reverted #N]`, or `[planned, not started]`. A thread with no tag is not done yet, so tag it.
-- **Problems.** At most 5, the recurring ones. Include the symptoms users keep reporting and any fix that shipped and was reverted, so the next attempt starts where the last one failed.
-- **Next move.** The single most useful next action, concrete.
+- **状态胶囊。** 最多 5 条。这份工作是什么，整体到哪一步。
+- **线索。** 每条一行，前面必须恰好带一个状态标签：`[merged #N]`、`[open PR #N]`、`[in flight <branch>]`、`[verified, uncommitted]`、`[reverted #N]`、`[planned, not started]`。没标签的线索就是还没做完，给它打上标签。
+- **问题。** 最多 5 条，挑反复出现的。要包含用户反复报的症状，以及任何发布过又被回滚的修复，好让下一次尝试从上一次失败的地方开始。
+- **下一步。** 唯一最有用的下一个动作，要具体。
 
-An adjacent feature or ticket stays out unless it blocks this one. When the capsule and thread lines outgrow a screen, cut detail before you cut threads. Write the brief through the **unslop** skill, cite chat findings by session id and shared-record findings by their source (PR #, ticket ID, chat permalink, error-tracker issue), and sanitize private context before any public output.
+相邻的功能或工单不写进来，除非它卡住了这一条。状态胶囊和线索行超出一屏时，先砍细节，别砍线索。简报过一遍 **unslop** 技能，聊天里的发现项引会话 id，共享记录里的发现项引来源（PR 号、工单 ID、聊天固定链接、错误追踪 issue），任何公开输出之前先把私有上下文脱敏。
 
-**Reply:** the brief, to the contract above.
+**回复：** 简报，按上面的契约。

@@ -1,40 +1,40 @@
-# Datadog Telemetry
+# Datadog 遥测
 
-## What this source contains
+## 这个来源里有什么
 
-Datadog holds the runtime record, what actually happened in production, as opposed to what was planned or discussed.
+Datadog 存的是运行时记录，生产环境实际发生了什么，而不是计划或讨论过什么。
 
-- **Metrics.** Counters, gauges, histograms instrumented by the team. A metric's *presence* is itself evidence. Someone thought this number worth watching.
-- **Monitors & alerts.** Conditions the team decided warranted waking someone up. A monitor firing on `rate_limit_hit > 10/min` is direct evidence the team worried about that threshold.
-- **Dashboards.** Curated views. The charts tell you what the team considers important for a subsystem.
-- **APM traces & spans.** Request-level runtime data. Useful for "why is this slow" / "why is there a timeout here" questions.
-- **Logs.** High-volume event records. Often contain the error conditions that motivated defensive code.
-- **Incidents.** Formal incident records with timelines and linked postmortems.
-- **Notebooks.** Exploratory investigations. Often contain hypotheses and analyses.
+- **指标。** 团队埋的计数器、仪表值（gauge）、直方图。一个指标的*存在*本身就是证据。有人认为这个数值得盯。
+- **监控器与告警。** 团队认定值得把人叫醒的条件。一个在 `rate_limit_hit > 10/min` 上触发的监控器，是团队担心那个阈值的直接证据。
+- **仪表盘。** 精选视图。图表告诉你团队认为一个子系统里什么重要。
+- **APM 链路与片段。** 请求级运行时数据。适合「这里为什么慢」「这里为什么超时」这类问题。
+- **日志。** 大量事件记录。常包含促成防御性代码的错误状况。
+- **事故。** 正式事故记录，带时间线和关联复盘报告。
+- **笔记本。** 探索性调查。常包含假设与分析。
 
-Datadog answers "what was the production reality around the time this code was written?", which often explains the code's shape.
+Datadog 回答「这段代码写成前后，生产环境的现实是什么」，这常常解释代码的形状。
 
-## How to search it
+## 怎么搜
 
-Use the Datadog MCP. Start broad, then narrow.
+用 Datadog MCP。先撒大网，再收窄。
 
-1. **Identify the owning service(s).**
+1. **确认归属服务。**
 
    ```
    search_datadog_services (filter by name or team)
    search_datadog_service_dependencies (see upstream/downstream)
    ```
 
-2. **Dashboards and monitors first. They tell you what the team cares about.**
+2. **先看仪表盘和监控器。它们告诉你团队在意什么。**
 
    ```
    search_datadog_dashboards (query: feature name, service name, symbol)
    search_datadog_monitors   (same queries)
    ```
 
-   When a dashboard or monitor covers the target, note its queries and watched thresholds. The threshold is frequently the answer to "why is this clamped at N?"
+   仪表盘或监控器覆盖到目标时，记下它的查询和盯的阈值。「为什么钳在 N」的答案常常就是那个阈值。
 
-3. **Metrics around the target.**
+3. **目标周边的指标。**
 
    ```
    search_datadog_metrics (by name pattern, e.g., the feature or symbol)
@@ -42,18 +42,18 @@ Use the Datadog MCP. Start broad, then narrow.
    get_datadog_metric (timeseries; "was there a spike around the PR date?")
    ```
 
-   Correlating a metric's trajectory with the target's add/change date is strong supporting evidence: "the `payment_timeout` metric spiked 2023-11-03, and the retry logic merged 2023-11-06."
+   把指标走势与目标的新增/修改日期对上，是有力的佐证。「`payment_timeout` 指标在 2023-11-03 飙升，重试逻辑于 2023-11-06 合并。」
 
-4. **Logs. Narrow, don't dump.**
+4. **日志。收窄，别倾倒。**
 
    ```
    search_datadog_logs (raw log patterns near the target, set use_log_patterns=true)
    analyze_datadog_logs (SQL-style aggregations, only when you need counts)
    ```
 
-   Search with symbols, error strings, or feature names. **Strongly prefer time-bounded queries** (e.g., 30 days before/after the change). Log volume is huge. Unconstrained searches waste time and may time out.
+   用符号、错误字符串或功能名搜。**强烈建议限定时间范围**（如改动前后各 30 天）。日志量巨大。不限范围的搜索浪费时间，还可能超时。
 
-5. **APM spans and traces.**
+5. **APM 片段与链路。**
 
    ```
    aggregate_spans    (stats: "how often does this endpoint fail?")
@@ -61,39 +61,39 @@ Use the Datadog MCP. Start broad, then narrow.
    get_datadog_trace  (a specific trace ID)
    ```
 
-   Useful for timeouts, retries, slow paths, and cross-service behavior.
+   适合超时、重试、慢路径和跨服务行为。
 
-6. **Incidents.**
+6. **事故。**
 
    ```
    search_datadog_incidents (by title, team, date range)
    get_datadog_incident     (full detail for a specific incident)
    ```
 
-   If the target looks defensive, search for incidents around the time it was added. An incident whose timeline includes "added defensive check for X" is near-direct evidence.
+   目标看着像防御性代码时，搜它加入前后那段时间的事故。时间线里有 "added defensive check for X" 的事故，接近直接证据。
 
-## What good evidence looks like here
+## 这里的好证据长什么样
 
-- A monitor whose query and threshold match the constraint the code enforces (code clamps to 100, monitor alerts when requests exceed 100/min)
-- A dashboard created by the target's author, with widgets that correspond to what the code measures or guards against
-- A metric showing a production spike immediately before the code was merged, and stable values after
-- An incident record referencing the target code, the same symbols, or the same error strings
-- Logs showing a specific error pattern the defensive code would prevent, timestamped in the window before the change
+- 一个监控器，其查询和阈值正好对上代码强制的约束（代码钳到 100，监控器在请求超过 100/min 时告警）
+- 目标作者建的仪表盘，小组件对应代码所测量或防范的东西
+- 一个指标在代码合并前夕出现生产尖峰，之后数值平稳
+- 一条引用目标代码、相同符号或相同错误字符串的事故记录
+- 日志显示防御性代码能防住的特定错误模式，时间戳落在改动前的窗口里
 
-## Common pitfalls
+## 常见坑点
 
-- **Correlation is not causation.** A spike before a PR and stabilization after is suggestive, not definitive. Other changes may have landed in the same window. Check neighboring PRs.
-- **Overfitting to the chart you found.** Datadog visualizations are *made* by humans and reflect that human's framing. A chart named "retry success rate" is evidence the team cared about retry success, not that it's why a specific line of code exists.
-- **Vanished telemetry.** Metrics can be renamed, deleted, or have short retention. If you can't find data from the relevant window, that's a gap, not a null result.
-- **Noise at scale.** Searching logs for a common string returns thousands of matches. Narrow by service, tag, and time aggressively. Use `analyze_datadog_logs` to aggregate rather than dumping raw logs.
-- **Instrumented != caused.** A metric's existence tells you someone cared enough to measure something, not that the code was added *because* of it. Cross-reference with commit/PR dates.
+- **相关不是因果。** PR 前飙升、PR 后平稳只是提示，不是定论。同一窗口可能落了别的改动。查相邻的 PR。
+- **对找到的图表过拟合。** Datadog 可视化是人*做*出来的，反映那个人的取景。一张叫 "retry success rate" 的图，证明团队在意重试成功率，不证明某行代码因它而存在。
+- **消失的遥测。** 指标会被改名、删除，或保留期很短。找不到相关窗口的数据，那是缺口，不是空结果。
+- **规模带来的噪声。** 拿常见字符串搜日志会返回几千条命中。狠一点，按服务、标签、时间收窄。用 `analyze_datadog_logs` 聚合，别倒原始日志。
+- **埋了点 != 因它而起。** 指标存在只说明有人在意到要测量它，不说明代码*因为*它而加。与提交/PR 日期交叉核对。
 
-## What to return
+## 返回什么
 
-For each relevant item:
-- Type (dashboard / monitor / metric / log pattern / trace / incident / notebook)
-- Title or name
-- Link or identifier (dashboard ID, monitor ID, metric name, incident ID)
-- Owner/author and created/modified date
-- The specific condition, query, or quote that bears on the question (verbatim where possible)
-- Relevance: what this suggests about the target code, and how strong the connection is
+每条相关条目，附上：
+- 类型（仪表盘 / 监控器 / 指标 / 日志模式 / 链路 / 事故 / 笔记本）
+- 标题或名称
+- 链接或标识（仪表盘 ID、监控器 ID、指标名、事故 ID）
+- 所有者/作者与创建/修改日期
+- 与问题相关的具体条件、查询或引文（尽量逐字）
+- 相关性：它对目标代码提示了什么，关联有多强

@@ -1,6 +1,6 @@
 ---
 name: principle-migrate-callers-then-delete-legacy-apis
-description: "Apply when replacing an internal API: migrate, then delete."
+description: "替换内部 API 时应用，先迁移再删除."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,11 +11,11 @@ metadata:
     related_skills: []
 ---
 
-# Migrate Callers Then Delete Legacy APIs
+# 先迁调用方，再删旧 API
 
-- Update tests to assert the new contract, and delete tests that only protect pre-refactor implementation details
+- 更新测试去断言新契约，删掉只保护重构前实现细节的测试
 
-**When this applies:**
-- No external users depend on backward compatibility
-- The project can absorb coordinated breaking changes
-- The new API is part of a simplification or refactor initiative
+**何时适用。**
+- 没有外部用户依赖向后兼容
+- 项目能承受协调一致的破坏性变更
+- 新 API 是简化或重构计划的一部分

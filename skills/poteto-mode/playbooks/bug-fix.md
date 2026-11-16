@@ -1,23 +1,23 @@
-# Bug Fix Playbook
+# 修 bug 操作手册
 
-**Trigger:** Something is broken. User reports a symptom.
+**触发条件：** 有东西坏了。用户报了一个症状。
 
-## Steps
+## 步骤
 
-1. **Reproduce it yourself.** Don't ask the user for more info yet - try to hit the bug with `terminal`, tests, or manual verification. If you can't reproduce, *then* ask. A bug you can't trigger is a bug you can't verify you fixed.
+1. **自己复现。** 先别急着向用户要更多信息，先用 `terminal`、测试或手动验证去撞这个 bug。复现不出来，*再*去问。一个你触发不了的 bug，就是一个你无法验证已修好的 bug。
 
-2. **Binary-search the cause.** Seed understanding with `pstack:how` over the affected subsystem. Then:
-   - Form 2-3 hypotheses for root cause.
-   - For each: find runtime evidence that confirms or eliminates it (`terminal` for logs/debugger, `search_files` for call sites, `read_file` to trace flow).
-   - Eliminate until one survives. If none survive, your model is wrong - re-read.
-   - **Grep every caller** of the function you're about to touch. The lazy fix is the root-cause fix: one guard in the shared path beats a guard in every caller.
+2. **二分查找原因。** 先用 `pstack:how` 对受影响的子系统建立理解。然后：
+   - 提出 2 到 3 个根因假设。
+   - 逐个找运行时证据来确认或排除（`terminal` 看日志/调试器，`search_files` 找调用点，`read_file` 追流程）。
+   - 一直排除到只剩一个。如果一个都不剩，说明你的模型错了，重读。
+   - **grep 你要动的那个函数的每一个调用方。** 最懒的修法就是根因修法：在共享路径上加一道守卫，胜过在每个调用方各加一道。
 
-3. **Plan the fix.** If it crosses a function/module boundary, run `pstack:architect` first. Otherwise, plan the minimal change traced to the evidence from step 2. Delegate implementation via `delegate_task` with specific scope and the evidence trail.
+3. **规划修复。** 如果跨越函数或模块边界，先跑 `pstack:architect`。否则，规划一个能追溯到第 2 步证据的最小改动。用 `delegate_task` 委派实现，带上具体范围和证据链。
 
-4. **Verify on the same surface** where you reproduced it. Same command, same input. The bug must be gone and nothing adjacent must break.
+4. **在同一个面上验证**，就在你复现它的那个面上。同一条命令，同一份输入。bug 必须消失，相邻的东西一个都不能坏。
 
-5. **Git history:** commit the failing reproduction *before* the fix commit. Reviewers should be able to check out the first commit and see it fail.
+5. **Git 历史：** 在修复提交*之前*，先提交那个失败的复现。审查者应该能检出第一个提交，看到它失败。
 
-## Key Rule
+## 关键规则
 
-Be scientific. Every shipped line traces to runtime evidence. "Might help" is not a fix - it's a second bug waiting for a page at 3am. If you can't explain *why* a line is necessary with evidence, delete it.
+要讲科学。每一行发布的代码都能追溯到运行时证据。「可能有用」不是修复，它是等着凌晨三点把你叫起来的第二个 bug。如果你不能用证据解释一行代码*为什么*必要，删掉它。

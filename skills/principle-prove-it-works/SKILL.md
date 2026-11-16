@@ -1,6 +1,6 @@
 ---
 name: principle-prove-it-works
-description: "Apply after finishing a task, before declaring it done."
+description: "任务做完后、宣布完成前应用."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,19 +11,19 @@ metadata:
     related_skills: []
 ---
 
-# Prove It Works
+# 证明它能用
 
-Verify every task output by checking the real thing directly. Do not infer from proxies, self-reports, or "it compiles."
+每个任务的产出都要直接查真实的东西来验证。不要从替代品、自我报告或「能编译」来推断。
 
-**Why:** Unverified work has unknown correctness. Indirect verification (file mtimes, output freshness, agent self-reports, cached screenshots) feels cheaper than direct observation. Acting on a wrong inference costs far more than checking the source.
+**为什么。** 未验证的工作正确性未知。间接验证（文件修改时间、输出新鲜度、代理自我报告、缓存截图）感觉比直接观察便宜。基于错误推断去行动，代价远高于查源头。
 
-Check the real thing, not a proxy:
-- Check process liveness directly, not indirectly through derived state
-- Read the actual value, not a cached or derived representation
-- When verification fails, suspect the observation method before suspecting the system
+查真实的东西，不查替代品。
+- 直接查进程是否活着，不通过派生状态间接查
+- 读实际的值，不读缓存或派生的表示
+- 验证失败时，先怀疑观察方法，再怀疑系统
 
-## Script the check when you can
+## 能把检查写成脚本就写
 
-The strongest proof is a deterministic script that re-runs the same comparison, not a one-time eyeball. Write the script, run it, and keep its output as an artifact a reviewer can re-run instead of trusting your word.
+最有力的证明是一个确定性脚本，重跑同样的比对，而不是一次性的目测。写脚本，跑它，把输出留成产物，让审查者能重跑，而不是信你一句话。
 
-Keep the artifact visible for the human. Commit it only for large or complex work where the trail has to be auditable later, like a big port or migration (the **show-me-your-work** skill).
+把产物摆出来给人看。只有大型或复杂的工作才提交它，比如大移植或迁移，这类痕迹日后必须可审计（**show-me-your-work** 技能）。

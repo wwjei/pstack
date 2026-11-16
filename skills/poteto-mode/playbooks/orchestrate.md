@@ -1,25 +1,25 @@
-### Orchestrate
+### 编排
 
-**You run the program, never the code. Decide which agent does each piece of work, then check what each one produces.** For a standing project handed to one coordinator chat: multi-day, many stacked PRs, dozens to hundreds of subagents, few human turns. One task driven to a predicate is Autonomous run. One ambitious run that needs a bespoke workflow is figure-it-out. Work that one agent could finish inside the session's budget is not a program.
+**你跑的是整个项目，绝不写代码。决定每块工作交给哪个代理，然后检查每个代理的产出。** 适用于交给一个协调器会话的长期项目，跨多天、多个堆叠 PR、几十到几百个子代理、人只参与少数几轮。单个任务推进到一个判定条件，那是 Autonomous run。一次需要定制流程的大跑，用 figure-it-out。一个代理在会话预算内就能干完的活，不算项目。
 
-Run it with your own tools. Spawn workers with `delegate_task`, and sub-coordinators as Kanban tasks. Keep the program's state in a `notes.md` tracker in a durable directory outside the repo checkout (not the scratch directory, which is pruned). Background `delegate_task` results and Kanban completions arrive as messages, so call no scripts, run no polling loops, and never relay messages or status between agents.
+用你自己的工具来跑。用 `delegate_task` 派子代理，子协调器做成看板任务。把项目状态记在仓库检出目录之外的持久目录里的 `notes.md` 跟踪文件中（不要用 scratch 目录，它会被清理）。后台 `delegate_task` 的结果和看板任务的完成通知都会以消息送达，所以不要调脚本，不要跑轮询循环，也绝不在代理之间转发消息或状态。
 
-#### Topology
+#### 拓扑
 
-- **One owner per PR.** The owner is the only writer of its branch and carries the PR from build to merge. Only the owner pushes, rebases, or retargets it. Closing or retargeting a base PR orphans every PR above it, so the owner does that only on your call. You never author or edit code. Conflicted merges, chain rebases, and fixes go to owners.
-- **A fresh worker for each independent task.** Its brief carries everything it needs, including each upstream report it depends on, pasted in full. A `delegate_task` child knows nothing of this conversation and can't see its siblings. Pick each subagent's model and reasoning budget for the job per `pstack:setup-pstack`.
-- **A sub-coordinator only when one area has many parallel workers.** `delegate_task` children cannot call `delegate_task`, so a sub-coordinator is a durable Kanban task (`kanban_create` with an assignee profile and `parents` for dependencies, read back with `kanban_show`). It owns that area's workers and briefs and sends you one rollup, never raw worker reports. Stop at three levels: you, sub-coordinators, and workers. Keep about ten workers in flight per coordinator, and start the next one as each finishes instead of waiting on a whole batch.
-- **Hand built state over through the branch.** When new work needs a worker's checkout or uncommitted changes, have that worker push first and point the new worker at the pushed branch. Never re-dispatch a worker just to check on it.
-- **Each PR gets a verifier that isn't its author,** on a different model family when the delegation config allows one. The owner merges only on that verifier's pass at the current head.
-- **Start with one unit.** Take it through brief, owner, verifier, and merge before you fan out, so a flaw in the brief costs one agent instead of fifty. On near-identical cheap units, the first unit is that test.
+- **每个 PR 一个所有者。** 所有者是其分支唯一的写入者，把 PR 从构建一路带到合并。只有所有者能推送、rebase（变基）或改它的基分支。关闭底层 PR 或改它的基分支，会让它上面的每个 PR 都断了根，所以所有者只有在你发话时才这么做。你绝不写代码或改代码。合并冲突、整链 rebase 和修复都交给所有者。
+- **每个独立任务派一个全新的子代理。** 它的任务说明带上它需要的一切，包括它依赖的每份上游报告，全文粘贴。`delegate_task` 的子代理对这段对话一无所知，也看不到兄弟代理。按 `pstack:setup-pstack` 为每个子代理挑适合这份工作的模型和推理预算。
+- **只有一个领域有很多并行子代理时才设子协调器。** `delegate_task` 的子代理不能再调 `delegate_task`，所以子协调器是一个持久的看板任务（用 `kanban_create` 指定执行的 profile 和表示依赖的 `parents`，用 `kanban_show` 读回）。它管那个领域的子代理和任务说明，只给你一份汇总，绝不转交子代理的原始报告。层级到三层为止，你、子协调器、子代理。每个协调器保持约十个在跑的子代理，一个完成就启动下一个，不要等整批。
+- **已构建的状态通过分支交接。** 新工作需要某个子代理的检出目录或未提交改动时，让它先推送，再把新子代理指向推上去的分支。绝不为了查看进度而重派一个子代理。
+- **每个 PR 配一个不是作者的验证器，** 委派配置允许时用不同的模型家族。只有验证器在当前 head 上给出通过，所有者才合并。
+- **从一个单元开始。** 先让它走完任务说明、所有者、验证器、合并这一整圈，再并行分发，这样任务说明里的缺陷只损失一个代理，而不是五十个。对几乎相同又便宜的单元，第一个单元就是这场测试。
 
-#### Supervision
+#### 监督
 
-- **Each brief names the evidence that proves the work is done,** such as a command and its expected output, a browser flow checked with `browser_navigate`, or an artifact. It also names the goal, the paths the worker may and may not write, and the actions it must not take. If you can't name the evidence, the unit isn't scoped yet.
-- **Read the diff or the artifact, not only the worker's summary.** A child's summary is a self-report. Green CI is an input to a verdict, not a verdict. Behavioral work needs more than a type check. A verdict covers one head SHA, so a new push needs a new verdict. Read a sample of each sub-coordinator's briefs while its workers run, and fix its instructions when one fails.
-- **Send back work that drifts from scope or grows past what was asked.** Keep only the fixes that block the program, and park the rest as follow-ups.
-- **Check a PR's live state before you report on it,** with `gh pr view` and `gh pr checks` or your forge's equivalents, not the worker's last report. Account for every worker you spawned as done, replaced, or absorbed into another worker's scope.
-- **Stop or replace a worker that stalls or loops.** Judge it by its pushes and PR activity, not its status text. Retry by cause: a smaller scope after a context or memory limit, the same brief after a dropped connection, and a different model after a tool error. After two retries, drop the unit and replan around it. When a stopped worker returns late, check its result against the PR's current state, and hand any unique findings to a fresh worker. After a Hermes restart, running `delegate_task` children are dead, while Kanban tasks and pushed branches survive. Reattach work by PR and branch.
-- **Ask the user only for a real decision or a blocker,** such as an irreversible action, a product or preference call that no experiment settles, or a dead end that survived a replan. Rebase mechanics, retries, CI flakes, review triage, and "should I keep going" never reach the user.
+- **每份任务说明点名能证明工作完成的证据，** 比如一条命令及其预期输出、用 `browser_navigate` 检查的浏览器流程，或一份产物。还要写明目标、子代理可写与不可写的路径、禁止的动作。说不出证据，这个单元的范围就还没切好。
+- **读 diff 或产物，别只读子代理的摘要。** 子代理的摘要是自述。CI 全绿是下结论的输入，不是结论本身。行为层面的工作，光过类型检查不够。一个结论只覆盖一个 head SHA，新推送就要新结论。子协调器的子代理在跑时，抽查它的任务说明，发现一份不合格就修正它的指示。
+- **偏离范围或超出要求的产出，打回。** 只留卡住项目的修复，其余记成后续事项。
+- **汇报一个 PR 之前先查它的实时状态，** 用 `gh pr view` 和 `gh pr checks` 或所在托管平台的等价命令，别用子代理的上一份报告。你派出的每个子代理都要有着落，完成、被替换，或并入另一个子代理的范围。
+- **停掉或替换卡住或打转的子代理。** 看它的推送和 PR 活动来判断，别看状态文字。按原因重试，上下文或内存到限就缩小范围，连接断了就用同一份任务说明，工具报错就换模型。重试两次之后，放弃这个单元，绕开它重新规划。被停掉的子代理迟到返回时，拿它的结果对照 PR 的当前状态，独有的发现项交给一个全新的子代理。Hermes 重启后，在跑的 `delegate_task` 子代理都死了，看板任务和已推送的分支还在。按 PR 和分支重新接上工作。
+- **只有真正的决策或阻塞才问用户，** 比如不可逆动作、实验定不了的产品或偏好取舍、重新规划后仍走不通的死路。rebase 的操作细节、重试、CI 偶发失败、审查分诊、「要不要继续」这类问题，绝不到用户那里。
 
-**Reply:** what landed against the goal, each PR's live state and verdict with its link, what was dropped and why, and the decisions waiting on the user.
+**回复：** 对照目标落地了什么，每个 PR 的实时状态、结论和链接，放弃了什么、为什么，以及等用户拍板的决策。

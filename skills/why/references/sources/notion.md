@@ -1,55 +1,55 @@
-# Notion Docs
+# Notion 文档
 
-## What this source contains
+## 这个来源里有什么
 
-- PRDs (product requirement documents)
-- Technical specs and RFCs
-- Architectural decision records (ADRs)
-- Meeting notes from design reviews
-- Team pages with domain context
-- Postmortems from incidents
-- Runbooks that may explain defensive code
-- Strategy documents that set priorities
+- PRD（产品需求文档）
+- 技术规格与 RFC
+- 架构决策记录（ADR）
+- 设计评审的会议记录
+- 带领域背景的团队页面
+- 事故复盘报告
+- 可能解释防御性代码的运行手册
+- 定优先级的战略文档
 
-Notion is where "why" often lives in long-form before it becomes code. A significant feature usually has a doc.
+「为什么」在变成代码之前，常以长文形式住在 Notion 里。一个重要功能通常有一篇文档。
 
-## How to search it
+## 怎么搜
 
-Use the Notion MCP.
+用 Notion MCP。
 
-1. **Keyword searches with `notion-search`.** Try:
-   - The feature name
-   - Key symbols / class names from the target code
-   - Author handles (design docs are often authored before the code lands)
-   - Error strings or user-visible terms
-   - Time-bounded queries if you know when the code shipped
-2. **Fetch candidate pages with `notion-fetch`.** Read the full content, not the preview. Rationale is often buried mid-document.
-3. **Follow backlinks and child pages.** Design docs often have sub-pages for alternatives considered, appendices, or implementation notes.
-4. **Check related databases.** `notion-query-data-sources` and `notion-query-meeting-notes` can surface meeting notes that discussed the decision.
-5. **Search author-specific spaces.** If the PR author has a personal notebook (common at some companies), it may hold exploratory thinking that preceded the code.
+1. **用 `notion-search` 做关键词搜索。** 试试：
+   - 功能名
+   - 目标代码里的关键符号 / 类名
+   - 作者账号（设计文档常在代码落地前写好）
+   - 错误字符串或用户可见的词
+   - 知道代码何时发布时，加时间范围
+2. **用 `notion-fetch` 拉候选页面。** 读全文，别只读预览。理由常埋在文档中段。
+3. **追反向链接和子页面。** 设计文档常有子页面，放考虑过的备选方案、附录或实现笔记。
+4. **查相关数据库。** `notion-query-data-sources` 和 `notion-query-meeting-notes` 能浮出讨论过该决策的会议记录。
+5. **搜作者个人空间。** PR 作者若有个人笔记本（有些公司常见），里面可能存着先于代码的探索性思考。
 
-## What good evidence looks like here
+## 这里的好证据长什么样
 
-- A PRD with a "Problem statement" or "Motivation" section that matches the target code's purpose
-- An "Alternatives considered" or "Rejected approaches" section
-- A postmortem that names the target code as the fix for a specific incident
-- Meeting notes that record "we decided X because Y" and tie to the same author/date range as the PR
-- An ADR template filled out non-trivially (status, context, decision, consequences)
+- 一篇 PRD，其「Problem statement」或「Motivation」小节与目标代码的用途相符
+- 一节「Alternatives considered」或「Rejected approaches」
+- 一篇复盘报告，点名目标代码是某次事故的修复
+- 会议记录里写着「我们决定 X，因为 Y」，且作者/日期范围与 PR 对得上
+- 一份认真填过的 ADR 模板（状态、背景、决策、后果）
 
-## Common pitfalls
+## 常见坑点
 
-- **Outdated docs.** Specs are often written before implementation and not updated. The doc may describe a plan that changed. Cross-check against the actual PR.
-- **Doc vs. reality drift.** A spec may say "we'll do X" but the code actually does Y. Flag the divergence. The synthesizer will surface the contradiction.
-- **Boilerplate templates.** Some orgs require a "Why" section that gets filled with fluff. Look for specificity.
-- **Unlinked docs.** The most relevant doc may not be linked from anywhere. Broad keyword searches help.
-- **Multiple drafts.** If a topic has multiple docs, find the one that was finalized or most recently updated. Check dates.
-- **Access-restricted pages.** If you can't access a page, note it as a gap.
+- **过时文档。** 规格常在实现前写好，之后不更新。文档描述的计划可能已经变了。与实际 PR 交叉核对。
+- **文档与现实漂移。** 规格可能写「我们要做 X」，代码实际做 Y。标出分歧。综合者会把矛盾摆出来。
+- **模板套话。** 有些组织要求「Why」小节，结果填的都是空话。找具体的内容。
+- **没被链接的文档。** 最相关的文档可能哪里都没链它。宽泛的关键词搜索有用。
+- **多份草稿。** 一个主题有多篇文档时，找定稿或最近更新的那篇。核对日期。
+- **受限页面。** 访问不了某个页面时，记成缺口。
 
-## What to return
+## 返回什么
 
-For each relevant doc:
-- Title and URL
-- Authors and last-updated date
-- The motivation text (verbatim quote), with page/section location
-- Relevant linked pages (so the synthesizer can cite them)
-- Whether the doc was finalized or draft
+每篇相关文档，附上：
+- 标题与 URL
+- 作者与最后更新日期
+- 动机文字（逐字引用），带页面/小节位置
+- 相关的链接页面（方便综合者做引用出处）
+- 文档是定稿还是草稿

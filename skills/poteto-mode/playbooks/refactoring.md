@@ -1,29 +1,29 @@
-# Refactoring Playbook
+# 重构操作手册
 
-**Trigger:** Behavior-preserving structural change. Rename, extract, reorganize, simplify.
+**触发条件：** 保持行为不变的结构改动。重命名、抽取、重组、简化。
 
-## Steps
+## 步骤
 
-1. **Capture baseline behavior.** Before any change, record what "correct" looks like:
-   - Run the test suite (`terminal`). Save the output.
-   - If tests are sparse, identify key behaviors manually and verify them. Document inputs → expected outputs.
-   - This baseline is your oracle for every step that follows.
+1. **抓住基线行为。** 任何改动之前，记下「正确」长什么样：
+   - 跑测试套件（`terminal`）。保存输出。
+   - 如果测试稀疏，手动找出关键行为并验证。记录输入 → 期望输出。
+   - 这个基线是后续每一步的判定基准。
 
-2. **Plan the restructuring.** Write down the sequence of moves. Each move should be:
-   - Small enough to verify in isolation.
-   - Independently committable (compiles, tests pass).
-   - Ordered so earlier moves don't depend on later ones.
+2. **规划重构。** 写下动作的顺序。每个动作应该：
+   - 小到能单独验证。
+   - 能独立提交（编译过、测试过）。
+   - 排序让前面的动作不依赖后面的。
 
-3. **Execute in small verified steps.** For each move:
-   - Make the change (`patch`, `write_file`, or `delegate_task` for mechanical transforms).
-   - Run the test suite / verification immediately.
-   - If anything breaks, fix it *in this step* before moving on.
-   - Commit this step with a message describing the structural change.
+3. **以小步验证的方式执行。** 对每个动作：
+   - 做改动（`patch`、`write_file`，机械变换用 `delegate_task`）。
+   - 立刻跑测试套件/验证。
+   - 任何东西坏了，*在这一步*修好再往下走。
+   - 提交这一步，信息描述这个结构改动。
 
-4. **Verify behavior unchanged** after the full sequence. Same tests, same manual checks as step 1. Diff the outputs. Any behavioral difference is a bug - find it and fix it or revert.
+4. **验证行为没变**，在整个序列之后。跟第 1 步同样的测试、同样的手动检查。对比输出。任何行为差异都是 bug，找出来修掉或回退。
 
-5. **Commit each step separately.** The git history should tell the story: each commit is one structural move, all tests green. Reviewers can bisect to any commit and see correct behavior.
+5. **每一步单独提交。** git 历史应该讲故事：每个提交是一个结构动作，测试全绿。审查者可以二分到任何提交，看到正确行为。
 
-## Key Rule
+## 关键规则
 
-Behavior must be identical before and after. A refactoring that changes behavior is not a refactoring - it's a feature or a bug. Verify after *every* step, not just at the end. The moment you skip verification is the moment you introduce a subtle regression you'll spend 3x longer finding.
+前后行为必须完全一致。改变了行为的重构不是重构，它是一个功能或一个 bug。*每一步*之后都验证，不只是最后。你跳过验证的那一刻，就是你引入一个隐蔽回归的那一刻，你得花三倍时间去找它。

@@ -1,15 +1,15 @@
-# Incident & Postmortem Context
+# 事故与复盘背景
 
-Not a separate source, a **cross-cutting angle**. Incidents often motivate defensive code ("we added this check after the X outage"), so if the target looks defensive (null checks, retry logic, timeout handling, rate limiting, feature flags), specifically hunt for incident history across every available source:
+不是一个独立来源，是一个**横切视角**。事故经常促成防御性代码（「X 那次故障之后我们加了这个检查」），所以目标看着像防御性代码（判空、重试逻辑、超时处理、限流、功能开关）时，专门到每个可用来源里翻事故历史：
 
-- **Notion**: search for postmortems mentioning the target file, feature, or error string
-- **Linear**: look for tickets labeled `incident`, `sev-*`, `postmortem-action-item`, `reliability`
-- **Slack**: search `#sev-*` and `#incident-*` channels around the dates the target code was added
-- **Git**: commits with messages like "fix for incident", "add defensive check", "revert" followed by "re-apply with..." are strong signals
-- **Datadog**: `search_datadog_incidents` for formal incident records with timelines, dashboards and monitors created as postmortem action items
-- **Sentry**: issues whose first-seen/last-seen window aligns with the target's PR ship date, stack traces through the target
-- **Databricks**: product-analytics events that classify an error condition (client-reported failures, user-visible retry events, etc.) often spike during an incident window. A drop in that event count after the target PR ships is circumstantial support that the target code resolved the user-visible symptom, even when Datadog/Sentry signal is noisy.
+- **Notion**：搜提到目标文件、功能或错误字符串的复盘报告
+- **Linear**：找带 `incident`、`sev-*`、`postmortem-action-item`、`reliability` 标签的工单
+- **Slack**：搜目标代码加入日期前后的 `#sev-*` 和 `#incident-*` 频道
+- **Git**：提交信息形如 "fix for incident"、"add defensive check"、"revert" 后接 "re-apply with..." 的，是强信号
+- **Datadog**：用 `search_datadog_incidents` 找带时间线的正式事故记录，以及作为复盘行动项建的仪表盘和监控器
+- **Sentry**：首见/末见窗口与目标 PR 发布日期对齐、堆栈穿过目标的问题
+- **Databricks**：给某类错误状况分类的产品分析事件（客户端上报的失败、用户可见的重试事件等）常在事故窗口内飙升。目标 PR 发布后该事件计数下降，是目标代码解决了用户可见症状的间接佐证，哪怕 Datadog/Sentry 的信号很吵。
 
-If you find an incident link, fetch the full postmortem. Postmortems typically have an "Action Items" section that ties directly to code changes. When multiple sources corroborate (a Datadog incident ID appears in a Linear ticket, which appears in a Notion postmortem, which appears in a Slack thread that links to the target PR, and the Databricks error-event count drops after the fix), the evidence is especially strong.
+找到事故链接就拉完整复盘报告。复盘报告通常有一节「Action Items」（行动项），直接对应代码改动。多个来源互相印证时（一个 Datadog 事故 ID 出现在某张 Linear 工单里，工单出现在某篇 Notion 复盘报告里，复盘报告出现在一条链到目标 PR 的 Slack 聊天讨论串里，且 Databricks 错误事件计数在修复后下降），证据格外强。
 
-Worth spending time on when the code's defensive character makes an incident-driven origin plausible. Skip it for code that doesn't look defensive.
+代码的防御性特征让事故驱动的出处显得合理时，值得花时间。不像防御性代码就跳过。

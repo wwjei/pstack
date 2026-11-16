@@ -1,6 +1,6 @@
 ---
 name: sharpen
-description: "Make a prompt deeper, not bigger, then rewrite it."
+description: "把提示词改深而不是改大，然后重写."
 version: 0.2.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,13 +11,13 @@ metadata:
     related_skills: []
 ---
 
-I want a deeper version of this task, not a bigger one. Before rewriting it, do four things:
+我要这个任务更深的版本，不是更大的版本。重写之前，做四件事：
 
-1. Say what a top professional in this field would do here that I'm not asking for.
-2. Name the rawest material they would start from instead of what has already been digested for me.
-3. Name the specific methods and tools they would use.
-4. Say what, other than you or me, would show the result is right.
+1. 说出这个领域的顶尖专业人士在这里会做、而我没要求的事。
+2. 点名他们会从的最原始的材料，而不是已经替我消化好的东西。
+3. 点名他们会用的具体方法和工具。
+4. 说出除了你或我之外，还有什么能表明结果是对的。
 
-Then rewrite my prompt to ask for exactly that. Return only the rewritten prompt. Do not do the task.
+然后重写我的提示词，恰好要求那些。只返回重写后的提示词。不要做这个任务。
 
-Leave choices that are mine to make open instead of deciding them.
+属于我来做的选择，留着开放，别替我决定。

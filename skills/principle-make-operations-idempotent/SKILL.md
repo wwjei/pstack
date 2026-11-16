@@ -1,6 +1,6 @@
 ---
 name: principle-make-operations-idempotent
-description: "Apply when designing commands or steps that may rerun."
+description: "设计可能重跑的命令或步骤时应用."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,19 +11,19 @@ metadata:
     related_skills: []
 ---
 
-# Make Operations Idempotent
+# 让操作幂等
 
-Design operations so they converge to the correct state regardless of how many times they run or where the previous run stopped. Every state-mutating operation should answer: "What happens if this runs twice? What happens if the previous run crashed halfway?"
+把操作设计成无论跑多少次、无论上一次停在哪里，都收敛到正确状态。每个改状态的操作都应当回答，「跑两遍会怎样？上一次跑到一半崩了会怎样？」
 
-**Why:** Commands, lifecycle operations, and processing loops run where crashes, restarts, and retries are normal. If partial state changes the next run's outcome, every restart becomes a debugging session.
+**为什么：** 命令、生命周期操作、处理循环跑在崩溃、重启、重试是常态的地方。如果部分完成的状态会改变下一次运行的结果，每次重启都变成一场调试。
 
-**The idea:** derive each step from the state that exists, not from what the previous run meant to do. Read the current state, compare it to the goal, and apply only the difference. A step written this way is safe to repeat, because a repeat finds nothing left to do.
+**思路：** 每一步从存在的状态推导，不是从上一次运行打算做什么推导。读当前状态，跟目标比，只施加差量。这样写的步骤可以安全重复，因为重复时发现没有剩下要做的事。
 
-Anything a run leaves behind, such as a lock, a temporary file, a half-written record, or a claimed job, must be recognizable as stale by the next run. Judge staleness by evidence that stays true wherever the previous run could have stopped, not only in the common case. A marker that the next run cannot judge turns every crash into manual cleanup. For example, write to a temporary path and rename it into place, or compare artifacts by content instead of by creation order.
+一次运行留下的任何东西，锁、临时文件、写了一半的记录、认领了的任务，都必须能被下一次运行认出是过期的。判断过期要靠证据，这证据在上一次运行可能停下的任何位置都成立，不只是常见情况。一个下一次运行无法判断的标记，会把每次崩溃都变成手工清理。比如，写到临时路径再改名到位，或者按内容而不是按创建顺序比较产物。
 
-**The test:**
-1. What happens if this runs twice in a row?
-2. What happens if the previous run crashed at every possible point?
-3. Does re-execution converge to the same end state?
+**检验：**
+1. 连续跑两遍会怎样？
+2. 上一次运行在每一个可能的位置崩掉会怎样？
+3. 重新执行会收敛到同一个终态吗？
 
-If any answer is "it depends on what state was left behind," the operation needs a reconciliation step.
+任何一个答案是「取决于留下了什么状态」，这个操作就需要一个调和步骤。

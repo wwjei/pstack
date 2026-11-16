@@ -1,6 +1,6 @@
 ---
 name: create-verification-skill
-description: "Generate a project-local skill that drives the real app."
+description: "生成驱动真实应用的项目本地技能."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -11,41 +11,41 @@ metadata:
     related_skills: []
 ---
 
-# Create a verification skill
+# 生成验证技能
 
-Every serious project needs a scripted way to drive the real app and prove behavior: launch it, exercise a feature the way a user would, and capture evidence. This skill generates that as a project-local skill (`Hermes profile skills directoryverify-<app>/`) tailored to the repo. You write the generator's output for the next agent, not for a human: it will be read cold, mid-task, by an agent that has never seen the app.
+每个认真的项目都需要一套脚本化的办法来驱动真实应用并证明行为：启动它，像用户那样操作一个功能，再采集证据。本技能把这套办法生成一个贴合仓库的项目本地技能（`Hermes profile skills directoryverify-<app>/`）。生成器的输出是写给下一个代理的，不是写给人的：一个从没接触过这个应用的代理，会在任务中途毫无铺垫地读它。
 
-## 1. Interview the repo, not the user
+## 1. 问仓库，不问用户
 
-Answer these from the codebase and only ask the user what you cannot observe:
+这些问题从代码库里找答案，只有观察不到的才问用户：
 
-- **Surface:** what does a user actually touch? A web UI, a CLI/TUI, a desktop app, an API, a mobile app, a library? A repo can have several; pick the primary one and note the rest.
-- **Run:** how does the app start locally? Prefer the repo's own documented dev command (package scripts, Makefile, README quickstart). Note ports, env vars, seed data, auth.
-- **Drive:** how can an agent interact with it programmatically? Existing harnesses first - Playwright/Cypress specs, expect scripts, PTY helpers, curl-able endpoints, a debug port. Only then pick a generic recipe: browser/CDP for web and Electron, a tmux/PTY harness for CLI/TUI, plain HTTP for services.
-- **Observe:** what evidence can be captured? Screenshots, terminal transcripts, response bodies, logs, exit codes, DB state.
-- **Isolate:** can two instances run side by side (ports, data dirs, profiles)? If not, say so in the generated skill: refusing to double-drive a shared instance beats corrupting the user's session.
+- **交互面：**用户实际接触的是什么？Web UI、CLI/TUI、桌面应用、API、移动应用，还是库？一个仓库可能有好几个；选主要的那个，其余记下来。
+- **运行：**应用在本地怎么启动？优先用仓库自己写明的开发命令（package scripts、Makefile、README 快速上手）。记下端口、环境变量、种子数据、认证。
+- **驱动：**代理怎么用程序跟它交互？先找现成的验证工装 - Playwright/Cypress 测试脚本、expect 脚本、PTY 辅助工具、能用 curl 调的端点、调试端口。都没有再选通用方案：Web 和 Electron 用浏览器/CDP，CLI/TUI 用 tmux/PTY 验证工装，服务用纯 HTTP。
+- **观察：**能采集什么证据？截图、终端会话记录、响应体、日志、退出码、数据库状态。
+- **隔离：**两个实例能不能并排跑（端口、数据目录、配置文件）？不能的话，在生成的技能里写明：拒绝重复驱动共享实例，好过弄坏用户的会话。
 
-If the checkout doesn't build or start as-is, fix that first (or report it precisely) before generating; a skill written against a broken base teaches wrong steps. When an irrelevant missing asset blocks startup (a static dir the API never serves, a sample config), the generated skill may create it, clearly marked as verification scaffolding, and remove it in cleanup.
+如果检出的代码原样构建不了或启动不了，先修好（或精确报告）再生成；对着坏地基写出来的技能会教错步骤。当无关的缺失资源挡住启动时（一个 API 根本不会提供的静态目录、一份示例配置），生成的技能可以创建它，明确标为验证脚手架，并在清理时移除。
 
-## 2. Generate the skill
+## 2. 生成技能
 
-Write `Hermes profile skills directoryverify-<app>/SKILL.md` with YAML frontmatter (`name: verify-<app>` and a `description` that names the app, the surface, and when to reach for it - without frontmatter the skill never registers) and these sections, each grounded in what the interview actually found (no placeholders left):
+写 `Hermes profile skills directoryverify-<app>/SKILL.md`，带 YAML frontmatter（`name: verify-<app>`，以及一个点明应用、交互面和何时该用它的 `description` - 没有 frontmatter 技能永远不会注册），并包含下面这些小节，每一节都落在摸底实际查到的东西上（不留占位符）：
 
-- **Launch:** the exact command that starts the app for verification, and how to tell it's ready (a log line, a port answering, a prompt). Include teardown. For a short-lived CLI or TUI there is no server to keep alive: launch means build the binary (or install deps) once, then start each drive in its own isolated PTY or tmux session.
-- **Doctor:** one read-only check that answers "is this instance worth driving?" - process up, right version/build, port owned by us, auth valid. An agent runs this first whenever anything looks off.
-- **Drive:** the harness recipe with real selectors/commands from this repo, not examples. Prefer stable handles (ARIA labels, data attributes, prompt strings, route paths) over coordinates and tab order.
-- **Evidence:** what to capture for a proof and where it goes. State the proof standards: exercise the real user path, not internal setters or test-only endpoints; capture the action and the resulting state, not just the final screen; verify side effects (files written, rows inserted, messages sent) alongside what's visible; mocks only where a production boundary already isolates the external system. When the safe path is a dry-run or test mode, verify what it actually skips by observing (files, network, git refs) rather than trusting its name: some dry-runs still touch the network or open a browser.
-- **Cleanup:** how to tear down instances the run created. Never kill by process name; kill what you started. Cleanup removes instances and scratch state, never the evidence: proof artifacts survive the teardown, in a location the skill names.
-- **Helpers:** any script the skill ships is executable and its invocation is shown in the skill body. A helper the reader has to reverse-engineer is not a helper.
+- **启动：**启动应用做验证的确切命令，以及怎么判断它就绪（一行日志、一个应答的端口、一个提示符）。包含拆除步骤。短命的 CLI 或 TUI 没有需要保活的服务器：启动意味着构建一次二进制（或装一次依赖），之后每次驱动都在各自隔离的 PTY 或 tmux 会话里开始。
+- **健康检查：**一条只读检查，回答「这个实例值得驱动吗？」 - 进程活着、版本/构建正确、端口归我们、认证有效。只要有任何不对劲，代理先跑它。
+- **驱动：**验证工装配方，用这个仓库里真实的选择器/命令，不是示例。优先用稳定的句柄（ARIA 标签、data 属性、提示符字符串、路由路径），别用坐标和 Tab 键顺序。
+- **证据：**一份证明要采集什么、放到哪里。写明证明标准：走真实的用户路径，不走内部设值函数或测试专用端点；采集动作和结果状态，不只是最终画面；在可见结果之外同时验证副作用（写出的文件、插入的数据行、发出的消息）；只在生产边界本来就隔离了外部系统的地方用模拟。当安全路径是试运行或测试模式时，靠观察（文件、网络、git 引用）核实它实际跳过了什么，别信它的名字：有的试运行照样碰网络、开浏览器。
+- **清理：**怎么拆除这次运行创建的实例。绝不按进程名杀进程；只杀你启动的。清理移除实例和临时状态，绝不动证据：证明产物在拆除后存活，放在技能指明的位置。
+- **辅助脚本：**技能附带的每个脚本都可执行，调用方式写在技能正文里。要读者自己逆向琢磨的辅助脚本不算辅助脚本。
 
-## 3. Seed the feature map
+## 3. 初始化功能地图
 
-Create `Hermes profile skills directoryverify-<app>/features/README.md` plus one file per user-facing feature you can identify (aim for the top 3-5 to start, from routes, commands, menus, or docs). Follow the shape in [`references/feature-map-example/`](references/feature-map-example/), with a README index and one file per feature. Each file answers, from the user's point of view: what the feature is, how to reach it, how to drive it with the harness, and what observable end state proves it works. The four H2s are `Sub-features`, `How to get to it (user POV)`, `Driving it with <harness>`, and `Gotchas`. The map is the repo's maintained verification source; a proof that drives one convenient entry point is incomplete when the map lists others.
+创建 `Hermes profile skills directoryverify-<app>/features/README.md`，再给每个能识别出的用户可见功能各建一个文件（起步先挑最重要的 3 到 5 个，从路由、命令、菜单或文档里找）。照 [`references/feature-map-example/`](references/feature-map-example/) 的形状来：一份 README 索引，每个功能一个文件。每个文件都从用户视角回答：这个功能是什么，怎么到达它，怎么用验证工装驱动它，什么可观察的终态能证明它能用。四个 H2 固定为 `Sub-features`、`How to get to it (user POV)`、`Driving it with <harness>` 和 `Gotchas`。功能地图是这个仓库持续维护的验证依据；地图还列着别的入口时，只驱动一个顺手入口的证明是不完整的。
 
-## 4. Prove the generated skill before handing it over
+## 4. 交付前先证明生成的技能能用
 
-Run its own instructions end to end once: launch, doctor, drive ONE mapped feature (one is enough; the map exists so later runs can cover the rest), capture evidence, clean up. After cleanup, confirm the evidence still exists at the named location - a cleanup that eats the proof fails this step. Fix what fails, and run the generated cleanup after every failed iteration too, so broken attempts don't strand processes and ports. A generated skill that was never executed is a draft, not a deliverable.
+把它自己的指令从头到尾跑一遍：启动、健康检查、驱动地图里的某一个功能（一个就够；地图的存在就是让后续运行覆盖其余功能）、采集证据、清理。清理之后，确认证据仍在指明的位置 - 把证明吃掉的清理过不了这一步。哪里失败修哪里，每次失败的迭代之后也要跑生成的清理，别让失败的尝试留下没人管的进程和端口。从没执行过的生成技能是草稿，不是交付物。
 
-## 5. Offer the maintenance loop
+## 5. 提供维护循环
 
-Point the user at `/maintain-verification-skill` for keeping the map honest as the app changes. Suggest a cadence only if they ask.
+把用户指向 `/maintain-verification-skill`，用来在应用变化时保持地图如实。用户主动问才建议维护节奏。
