@@ -1,12 +1,12 @@
-### Authoring or modifying a skill
+### 编写或修改一个技能
 
-**You own the skill's voice.**
+**这个技能的语气由你负责。**
 
-1. Use the **create-skill** skill (Hermes Agent's built-in for authoring SKILL.md files).
-2. Validate the skill: frontmatter has `name` and `description`, referenced files exist, cross-skill links resolve.
-3. Test cases if structural. Skip if subjective.
-4. Run **Opening a PR**.
+1. 用 **create-skill** 技能（Hermes Agent 内置的 SKILL.md 编写技能）。
+2. 校验这个技能：frontmatter 有 `name` 和 `description`，被引用的文件都存在，跨技能链接都能解析。
+3. 结构性的内容配测试用例。主观性的内容跳过。
+4. 跑 **Opening a PR** 操作手册：`skill_view(name='pstack:poteto-mode', file_path='playbooks/opening-a-pr.md')`。
 
-When in doubt, delete. Keep only prose that changes a decision. Tell it to do the thing and skip the reason. Explain only when the rule is confusing without one. Match tone to scope. Point at structural sources (types, READMEs, config) per the **encode-lessons-in-structure** principle skill. Delegate to other skills by path. Don't restate. A workflow you keep hitting but isn't captured → propose a new skill.
+拿不准就删。只留能改变决策的文字。直接叫它去做那件事，理由省掉。只有当一条规则不给理由就令人困惑时，才解释。语气匹配范围。按 **encode-lessons-in-structure** 原则技能的做法，指向结构性的来源（类型、README、配置）。委派给别的技能时给路径。不要复述。一个你反复撞上、却还没被记下来的流程，就提议建一个新技能。
 
-**Reply:** summary of the skill, key design decisions, validation notes.
+**回复：** 技能摘要、关键设计决策、校验说明。

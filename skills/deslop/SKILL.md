@@ -1,6 +1,6 @@
 ---
 name: deslop
-description: Remove AI-generated code slop from a diff before committing.
+description: 提交前去掉 diff 里的代码 AI 味.
 version: 1.0.0
 author: Cursor team kit (Cursor), ported for Hermes
 license: MIT
@@ -11,22 +11,22 @@ metadata:
     related_skills: [pstack:unslop]
 ---
 
-# Remove AI code slop
+# 去掉代码里的 AI 味
 
-Check the diff against main and remove AI-generated slop introduced in the branch. Get the diff with `terminal` (`git diff main...HEAD`), make the edits with `patch`.
+对着 main 检查 diff，清掉这个分支引入的代码 AI 味。用 `terminal` 拿 diff（`git diff main...HEAD`），用 `patch` 做修改。
 
-## Focus Areas
+## 重点看这几处
 
-- Extra comments that are unnecessary or inconsistent with local style
-- Defensive checks or try/catch blocks that are abnormal for trusted code paths
-- Casts to `any` used only to bypass type issues
-- Deeply nested code that should be simplified with early returns
-- Other patterns inconsistent with the file and surrounding codebase
+- 多余的注释，或者跟本地风格不一致的注释
+- 在可信代码路径上反常的防御性检查或 try/catch
+- 只为绕过类型问题而转成 `any` 的强制转换
+- 该用提前返回来简化的深层嵌套
+- 其他跟本文件及周边代码库不一致的写法
 
-## Guardrails
+## 约束
 
-- Keep behavior unchanged unless fixing a clear bug.
-- Prefer minimal, focused edits over broad rewrites.
-- Keep the final summary concise (1-3 sentences).
+- 除非在修一个明确的 bug，否则保持行为不变。
+- 优先做最小、聚焦的修改，不做大范围重写。
+- 最终总结保持简短（1 到 3 句）。
 
-`pstack:unslop` does the same job for prose. This skill is for code.
+`pstack:unslop` 对文字做同样的事。这个技能管代码。

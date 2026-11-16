@@ -1,6 +1,6 @@
 ---
 name: unslop
-description: "Cut AI tells from writing. Apply to all prose surfaces."
+description: "去掉文字里的 AI 味，所有文字产出都过一遍."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -13,53 +13,54 @@ metadata:
 
 # Unslop
 
-Remove AI-generated writing patterns. Make prose sound human.
+去掉 AI 生成的写作套路。让文字读起来像人写的。
 
-## When to Use
+## 何时使用
 
-Apply after drafting any user-facing text: docs, READMEs, commit messages, comments, reports, emails. Run as a final pass before delivery.
+任何面向用户的文字起草完之后都过一遍：文档、README、提交信息、注释、报告、邮件。交付前的最后一道工序。
 
-## Patterns to Detect and Kill
+## 要检出并杀掉的套路
 
-### Content Smells
+### 内容上的味道
 
-- **Puffery**: "revolutionary", "groundbreaking", "elegant" - delete or replace with specifics
-- **Name-dropping**: gratuitous mentions of frameworks/people for authority - cut unless citing a source
-- **Superficial -ing phrases**: "leveraging the power of", "harnessing cutting-edge" - say what it does
-- **Promotional language**: "exciting", "powerful", "seamless" - state facts instead
-- **Vague attributions**: "experts say", "studies show" - cite or cut
+- **吹捧**：「革命性的」「开创性的」「优雅的」，删掉，或者换成具体事实
+- **拉大旗**：为了显得权威而顺手提起框架或人名，除非是在引用来源，否则删掉
+- **空心动名词**：「充分发挥……的能力」「借力前沿的……」，直接说它做什么
+- **推销腔**：「令人兴奋」「强大」「无缝」，改成陈述事实
+- **含糊归因**：「专家说」「研究表明」，要么给出处，要么删掉
 
-### Language Smells
+### 语言上的味道
 
-- **AI vocabulary** - ban list: additionally, crucial, delve, enhance, foster, garner, interplay, intricate, landscape, pivotal, showcase, tapestry, testament, underscore, vibrant. Replace with plain words or restructure.
-- **Fancy 'is' substitutes**: "represents", "constitutes", "serves as" - just say "is"
-- **"Not just X but Y"** - pick the stronger claim and say it once
-- **Rule of three**: "fast, reliable, and scalable" - pick the one that matters most here
-- **Synonym cycling**: using three words for the same thing to sound varied - pick one and repeat it
+- **AI 词汇**，英文禁用清单：additionally、crucial、delve、enhance、foster、garner、interplay、intricate、landscape、pivotal、showcase、tapestry、testament、underscore、vibrant。换成平实的词，或者重写句子。
+- **AI 词汇**，中文禁用清单：赋能、助力、打造、深耕、闭环、抓手、颗粒度、值得注意的是、综上所述、总而言之、不仅仅是、在……的今天、随着……的不断发展。换成平实的词，或者重写句子。
+- **花哨的「是」**：「代表着」「构成了」「充当着」，直接说「是」
+- **「不仅 X，而且 Y」**：挑更强的那个论断，说一遍就够
+- **三段式排比**：「快、稳、可扩展」，挑此处最要紧的那一个
+- **同义词轮换**：为了显得有变化，同一个东西换三个词说，挑一个然后一直用它
 
-### Style Smells
+### 风格上的味道
 
-- **Em dashes** - avoid entirely. Use periods or commas. Every em dash is a sentence that couldn't commit to being one or two sentences.
-- **Colons as mid-sentence connectors**: "The answer is clear: we need X" - rewrite as two sentences or drop the windup
-- **Rhetorical questions as transitions**: "But what does this mean?" - state it directly
-- **One-sentence paragraphs for drama** - merge into surrounding paragraph or cut
+- **破折号** - 完全避开。用句号或逗号。每一个破折号，都是一个不敢决定自己该算一句还是两句的句子。
+- **冒号做句中连接词**：「答案很清楚：我们需要 X」，重写成两句，或者把铺垫删掉
+- **反问句做过渡**：「但这意味着什么呢？」，直接说结论
+- **为了戏剧效果的单句段落** - 并进上下段，或者删掉
 
-## Procedure
+## 流程
 
-1. **Scan** - read all prose surfaces (docs, comments, UI strings) via `read_file` or `search_files`. Flag pattern matches from the lists above.
+1. **扫一遍** - 用 `read_file` 或 `search_files` 读完所有文字面（文档、注释、界面文案）。按上面的清单标出命中处。
 
-2. **Rewrite** - fix each flag. Preserve meaning. Shorter is better. Use `patch` for targeted fixes.
-   - Replace banned words with plain equivalents
-   - Collapse inflated phrases to direct statements
-   - Break em-dash sentences into two sentences
-   - Delete puffery that carries no information
+2. **重写** - 逐处修掉。保住原意。越短越好。定点修改用 `patch`。
+   - 禁用词换成平实的对应词
+   - 膨胀的短语压成直白的陈述
+   - 带破折号的句子拆成两句
+   - 不携带信息的吹捧删掉
 
-3. **Add soul** - mechanical de-slopping produces bland text. After cleaning:
-   - **Have opinions**: "X is better than Y because Z" beats "X and Y each have tradeoffs"
-   - **Vary rhythm**: mix short sentences with longer ones. Not every sentence needs a clause.
-   - **Acknowledge complexity**: "this breaks when..." is more trustworthy than "this handles..."
-   - **Use 'I' when it fits**: first person beats passive voice for decisions and recommendations
-   - **Let some mess in**: one imperfect-but-honest sentence beats three polished-but-empty ones
-   - **Be specific**: "saves ~200ms per request" beats "significantly improves performance"
+3. **加点魂** - 机械去味会产出寡淡的文字。清理完之后：
+   - **有观点**：「X 比 Y 好，因为 Z」胜过「X 和 Y 各有取舍」
+   - **变节奏**：长短句混着来。不是每句都需要从句。
+   - **承认复杂度**：「这个在……时会崩」比「这个能处理……」更可信
+   - **该用「我」就用**：讲决策和建议时，第一人称胜过被动语态
+   - **容一点毛糙**：一句不完美但诚实的话，胜过三句打磨过但空洞的话
+   - **给具体数**：「每个请求省约 200ms」胜过「显著提升性能」
 
-4. **Self-audit** - reread the final text. If any sentence could appear in a random AI blog post without looking out of place, rewrite it.
+4. **自审** - 重读最终文本。任何一句要是放进一篇随便的 AI 博客里也毫不违和，就重写它。

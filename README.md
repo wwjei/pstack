@@ -4,6 +4,12 @@ Poteto's engineering rigor stack, adapted for [Hermes Agent](https://hermes-agen
 
 Fork of [pstack](https://github.com/cursor/plugins/tree/main/pstack) by poteto (Meta/Netflix, React core team). Originally built as a Cursor plugin, adapted here for Hermes Agent with native skills, delegate_task orchestration, and playbook routing.
 
+## 中文版（zh-cn 分支）
+
+核心技能已译成中文：`poteto-mode`（含编写技能的操作手册）、`how`、`architect`、`interrogate`、`swarm`、`unslop`、`deslop`、`setup-pstack`。其余技能与 `docs/guide/` 保持英文原文。
+
+术语与文风统一按 [中文术语表](docs/zh-cn-glossary.md)。技能名、工具名、配置键、`pstack:` 引用一律保留原文，改了会失效。
+
 ## What it does
 
 One orchestrator skill (`poteto-mode`) routes tasks to playbooks. Supporting skills cover exploration, design, review, delegation, cleanup, memory, teaching, verification, and workflow.

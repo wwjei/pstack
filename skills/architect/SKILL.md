@@ -1,6 +1,6 @@
 ---
 name: architect
-description: "Design types and module structure before writing code."
+description: "写代码前先设计类型与模块结构."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -13,60 +13,60 @@ metadata:
 
 # Architect
 
-Sketch types, signatures, and module boundaries with pseudocode before implementing. Design it twice, pick the simpler public surface.
+实现之前，用伪代码把类型、签名和模块边界画出来。设计两遍，挑公开接口更简单的那个。
 
-## When to Use
+## 何时使用
 
-Before building a new subsystem, feature, or significant refactor. When the shape of the code matters more than getting something running fast.
+在动手做新子系统、新功能或大重构之前。当代码的形状比「快点跑起来」更重要时。
 
-## Phases
+## 阶段
 
-### A. Ground the Problem
+### A. 把问题落地
 
-Run `pstack:how` over relevant existing subsystems. Understand what's already there before designing something new. Read the code the new work will touch and integrate with.
+对相关的现有子系统跑一遍 `pstack:how`。先搞清已经有什么，再设计新东西。读一遍新工作将要碰到、将要对接的代码。
 
-### B. Sketch
+### B. 画草图
 
-Delegate 2+ structurally distinct design candidates via `delegate_task`. "Structurally distinct" means different module boundaries, different type hierarchies, or different data flow - not just naming variations.
+用 `delegate_task` 委派 2 个以上结构上不同的设计候选。「结构上不同」指模块边界不同、类型层次不同，或者数据流不同，不是只换换命名。
 
-Each candidate produces, in this order:
+每个候选按这个顺序产出：
 
-1. **Caller's usage first** - show how consuming code calls the new API. This is the design. Everything else serves it.
-2. **Type sketch** - the types/interfaces needed, with fields and key methods. Pseudocode is fine.
-3. **Function signatures** - public API with input/output types and brief behavior notes.
-4. **Module map** - which files hold what, and dependency direction between them.
-5. **Rationale** - why this shape, what tradeoff it makes, what it optimizes for.
+1. **先写调用方怎么用** - 展示使用方代码怎么调这个新 API。这就是设计本身。其他一切都为它服务。
+2. **类型草图** - 需要哪些类型和接口，带字段和关键方法。伪代码就行。
+3. **函数签名** - 公开 API，带入参出参类型和简短的行为说明。
+4. **模块地图** - 哪些文件放什么，以及它们之间的依赖方向。
+5. **理由** - 为什么是这个形状，做了什么取舍，为什么目标优化。
 
-Compare candidates on **interface depth**: how much does a caller need to know to use it correctly? Prefer the design that hides more complexity behind a simpler public surface.
+用**接口深度**来比较候选：调用方要用对它，得先知道多少东西？优先选那个把更多复杂度藏在更简单公开接口后面的设计。
 
-Assume the next contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Reject candidates with these red flags:
+假设下一个接手的是个代理，它只看得见自己打开过的文件，照抄最近的例子，走能编译过的最短路径。带这些红旗的候选直接否掉：
 
-- **Split ownership.** More than one module writes the same state. Give each piece of state one owner.
-- **Two ways to do one task.** Keep one way, move callers off the others, delete them in the same change.
-- **Importable internals.** Make internals unreachable from outside the module so an outside import fails the build.
-- **Hand-synced list.** Keep one list and derive the others, or make the build fail when they disagree.
-- **Shallow modules and pass-through methods.** A layer that forwards the same arguments without hiding complexity. Remove it.
+- **所有权分裂。** 超过一个模块在写同一份状态。每份状态只给一个所有者。
+- **一件事两种做法。** 留一种，把调用方迁过去，在同一次改动里把其余的删掉。
+- **内部实现可被 import。** 让内部东西从模块外面够不着，外部 import 直接编译失败。
+- **手工同步的清单。** 只留一份清单，其余派生出来；或者让它们不一致时构建就失败。
+- **浅模块和透传方法。** 一层只是把同样的参数转发下去，没藏住任何复杂度。删掉。
 
-Prefer the design where a change that looks right from one file is right for the whole repo.
+优先选那种设计：在一个文件里看着对的改动，对整个仓库也是对的。
 
-### C. Agree (Optional)
+### C. 达成一致（可选）
 
-If the user wants input, present a synthesized comparison:
-- What both candidates share (the non-negotiable structure)
-- Where they diverge (the actual design decision)
-- Recommendation with reasoning
+如果用户想参与，给一份综合后的对比：
+- 两个候选共有的部分（不可协商的结构）
+- 它们分岔的地方（真正要做的设计决策）
+- 带理由的推荐
 
-### D. Implement
+### D. 实现
 
-Delegate code-writing against the chosen sketch via `delegate_task`. The sketch is the spec - implementation should match the types and signatures, not reinvent them.
+用 `delegate_task` 对着选中的草图委派写代码。草图就是规格，实现应当对上那些类型和签名，而不是重新发明一套。
 
-### E. Scrap
+### E. 推翻
 
-If implementation reveals the sketch was wrong (types don't compose, edge case breaks the model, performance requires different structure), go back to phase B. Redesign with the new information. Sunk cost on the sketch is zero - that's the point of sketching.
+如果实现过程暴露出草图错了（类型组合不起来、边界情况打破了模型、性能要求另一种结构），回到阶段 B。带着新信息重新设计。草图上的沉没成本是零，这正是画草图的意义。
 
-## Key Rules
+## 关键规则
 
-- **Design it twice.** At least 2 distinct candidates. One candidate means you picked the first idea that worked, not the best one.
-- **Caller-first.** If you can't show clean usage code, the design isn't ready.
-- **Simpler surface wins.** Between two designs that both work, prefer fewer public types, fewer required arguments, fewer concepts a caller must understand.
-- **Sketches are disposable.** They exist to be compared and thrown away. Don't polish them.
+- **设计两遍。** 至少 2 个不同的候选。只有一个候选，说明你挑的是第一个能用的想法，不是最好的那个。
+- **调用方优先。** 拿不出干净的用法代码，设计就还没就绪。
+- **接口更简单的赢。** 两个都能用的设计之间，选公开类型更少、必填参数更少、调用方必须理解的概念更少的那个。
+- **草图是一次性的。** 它们存在就是为了被比较然后被扔掉。别去打磨它们。

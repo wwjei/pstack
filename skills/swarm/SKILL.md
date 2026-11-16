@@ -1,6 +1,6 @@
 ---
 name: swarm
-description: "Fan out parallel workers via delegate_task, drain, report."
+description: "用 delegate_task 并行分发子代理，收齐后汇总."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -13,47 +13,47 @@ metadata:
 
 # Swarm
 
-Fan out N parallel `delegate_task` workers, collect results, consolidate into one report.
+并行分发 N 个 `delegate_task` 子代理，收集结果，合并成一份报告。
 
-## When to Use
+## 何时使用
 
-When a task decomposes into independent slices that can run concurrently: reviewing multiple files, checking multiple services, exploring multiple subsystems, running the same analysis with different parameters.
+任务能拆成可以并发跑的独立切片时：审多个文件、查多个服务、探多个子系统、用不同参数跑同一套分析。
 
-## Phases
+## 阶段
 
-### A. Frame
+### A. 划定框架
 
-1. **Done predicate** - state what "complete" means before spawning anything.
-2. **Shape** - pick one:
-   - **Partition**: each worker covers a distinct slice (files, modules, endpoints). No overlap.
-   - **Race**: all workers cover the same brief independently. Pick the best result.
-   - **Mix**: some workers partition, some race. Use when part of the work benefits from redundancy.
-3. **Set N** - number of workers. Match to the number of slices (partition) or desired redundancy (race).
+1. **完成判定条件** - 在派出任何东西之前，先说清「完成」是什么意思。
+2. **形态** - 选一种：
+   - **分区**：每个子代理覆盖一个不同的切片（文件、模块、接口）。互不重叠。
+   - **竞速**：所有子代理各自独立跑同一份任务说明。挑最好的结果。
+   - **混合**：一部分分区，一部分竞速。当部分工作值得冗余时用。
+3. **定 N** - 子代理数量。按切片数（分区）或想要的冗余度（竞速）来定。
 
-### B. Fan Out
+### B. 并行分发
 
-Spawn all workers in one `delegate_task` call with multiple tasks. Each brief is self-contained:
+在一次 `delegate_task` 调用里带多个任务，把所有子代理一次派出。每份任务说明都要自洽完整：
 
-- **Goal**: what this worker produces
-- **Scope/slice**: exactly what subset it covers (file list, module, endpoint)
-- **How to verify**: how the worker checks its own work
-- **Report format**: use `PASS / ISSUES / BLOCKED` with evidence (file paths, output, error messages). A worker that can prove a defect reports `ISSUES` and lists every issue it can prove, not only the first.
-- **Exact targets**: when workers verify or measure commits, the brief names the exact SHAs. A measurement brief also names the method (sample count, what one sample is, order). The worker records both in its result.
+- **目标**：这个子代理要产出什么
+- **范围与切片**：它到底覆盖哪个子集（文件清单、模块、接口）
+- **怎么验证**：它如何检查自己的工作
+- **报告格式**：用 `PASS / ISSUES / BLOCKED`，带证据（文件路径、输出、报错信息）。能证明缺陷的子代理报 `ISSUES`，并列出它能证明的每一条问题，不是只列第一条。
+- **确切目标**：子代理要核实或测量某些提交时，任务说明里点名确切的 SHA。测量类的任务说明还要点名方法（样本数、一个样本是什么、顺序）。子代理把这两样都记进结果里。
 
-Workers must not depend on each other's output.
+子代理之间不得依赖彼此的输出。
 
-### C. Aggregate
+### C. 汇总
 
-Read all results. Drop a result that does not record the SHAs and method its brief names, and rerun that worker once. After a second miss, record a gap. A gap does not count as a pass.
+读完所有结果。任务说明点名了 SHA 和方法，结果里却没记录的，丢掉这份结果，并把那个子代理重跑一次。第二次还是缺，就记一个缺口。缺口不算通过。
 
-- **Partition**: every slice must have a result. Missing slice = gap, call it out.
-- **Race**: apply selection rule (most thorough, most critical, consensus).
-- Flag any `BLOCKED` workers - report what blocked them and whether it matters.
+- **分区**：每个切片都必须有结果。缺切片就是缺口，点出来。
+- **竞速**：套用选择规则（最详尽的、最关键的、共识的）。
+- 标出任何 `BLOCKED` 的子代理，报告是什么卡住了它，以及这要不要紧。
 
-### D. Report
+### D. 报告
 
-One consolidated report:
-- **Summary**: pass/fail, coverage (N/N slices or N workers agreed)
-- **Table**: worker | slice | status | key finding
-- **Issues**: merged and deduplicated, ordered by severity
-- **Gaps**: slices with no result or blocked workers
+一份合并后的报告：
+- **摘要**：通过还是失败，覆盖度（N/N 个切片，或 N 个子代理达成一致）
+- **表格**：子代理 | 切片 | 状态 | 关键发现
+- **问题**：合并去重，按严重程度排序
+- **缺口**：没有结果的切片，或者被卡住的子代理

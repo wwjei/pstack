@@ -1,6 +1,6 @@
 ---
 name: interrogate
-description: "Use before merging to have adversaries break a change."
+description: "合并前让对抗审查者来拆这次改动."
 version: 0.2.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -13,32 +13,32 @@ metadata:
 
 # Interrogate
 
-Adversaries try to break a change or a design. A finding survives only when a run proves it. Report the findings. Do not apply fixes.
+对抗审查者试着把一次改动或一个设计拆掉。一条发现项只有在运行证明它之后才算存活。汇报发现项。不要动手修。
 
-## When to Use
+## 何时使用
 
-Before merging significant changes, or to stress test a design you can prototype. Say "interrogate", "adversarial review", "challenge this", "stress test this code", "find blind spots", or "tear this apart".
+合并重要改动之前，或者要压测一个能做原型的设计时。用户说「interrogate」「对抗式审查」「挑战一下这个」「压测这段代码」「找盲点」或者「把这个撕开看看」。
 
-## Frame
+## 划定范围
 
-The scope is what the user names. Otherwise it is the branch diff from its merge base with the base branch, through the working tree (`terminal` with `git diff $(git merge-base HEAD origin/main)`). State the intent with `pstack:in-your-own-words`, from the user's message, the commits, and the PR description. Ask the user when the intent is unclear.
+范围以用户点名的为准。否则就是当前分支相对基分支合并基（merge base）的 diff，一直算到工作树（用 `terminal` 跑 `git diff $(git merge-base HEAD origin/main)`）。用 `pstack:in-your-own-words`，根据用户的消息、提交记录和 PR 描述，把意图说清楚。意图不明时就问用户。
 
-## Fan out
+## 并行分发
 
-Spawn two or three adversaries in parallel with `delegate_task`. Give each its own scratch copy of the repo (a `git clone` or `git worktree add` under the scratch directory) with the scope's uncommitted changes applied, so repros never touch the real checkout. When the delegation config allows another model family, run adversaries on different families. Otherwise vary the angle each one attacks first. Give each adversary the scope, the intent, its copy's absolute path, and this brief:
+用 `delegate_task` 并行派出两到三个对抗审查者。给每个一份自己的仓库临时副本（在 scratch 目录下 `git clone` 或 `git worktree add`），并把范围内的未提交改动应用上去，这样复现永远碰不到真实的检出目录。委派配置允许换模型家族时，让对抗审查者跑在不同家族上。否则就让每个先攻击的角度不同。给每个对抗审查者：范围、意图、它那份副本的绝对路径，以及这段任务说明：
 
-> Break this change. Prove each finding with a run against the real code, such as a failing test, a repro script, or command output that shows the wrong behavior. For a design or plan, run a prototype or probe the current tree. Keep repros in your own copy. Report each finding with a title, the exact command, the output it printed, and the output the intent requires. Leave out anything you did not run. That covers style, naming, structure, and risks that need a future change to matter. No findings is a valid result.
+> 把这次改动拆掉。每条发现项都要用一次针对真实代码的运行来证明，比如一个失败的测试、一个复现脚本，或者一段显示错误行为的命令输出。对设计或方案，就跑一个原型，或者探一探当前的代码树。复现留在你自己的副本里。每条发现项都汇报标题、确切的命令、它打印出的输出，以及意图所要求的输出。没运行过的东西一律不写。这包括风格、命名、结构，以及那些要等未来某次改动才会显出影响的风险。没有发现项也是有效结果。
 
-If an adversary returns nothing, continue with the rest and note the dropout.
+如果某个对抗审查者什么都没返回，带着其余的继续，并记下这个掉队的。
 
-## Verify
+## 核实
 
-Rerun each finding's command yourself with `terminal`. Keep a finding when the output shows the failure and the failure breaks the intent. Drop the rest. Merge findings that share a root cause.
+每条发现项的命令，你自己用 `terminal` 重跑一遍。输出显示了失败，并且这个失败破坏了意图，才留下这条发现项。其余丢掉。共享同一个根因的发现项合并成一条。
 
-Adversaries find different failures, so the verdict keeps every verified finding, not one adversary's list. Do not pick a winner.
+不同对抗审查者找到的是不同的失败，所以结论要保留每一条核实过的发现项，不是只取某一个对抗审查者的清单。不要评出胜者。
 
-## Output
+## 输出
 
-- **Intent**: the restatement.
-- **Findings**: for each verified finding, the command, its output, how it breaks the intent, and the adversaries that found it. Say "no verified findings" when none survive.
-- **Dropped**: for each adversary, the count of dropped findings and why.
+- **意图**：那段重述。
+- **发现项**：每条核实过的发现项，给出命令、它的输出、它如何破坏意图，以及哪些对抗审查者找到了它。一条都没存活时，写「没有核实过的发现项」。
+- **丢弃**：每个对抗审查者被丢弃的发现项数量，以及原因。

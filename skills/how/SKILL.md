@@ -1,6 +1,6 @@
 ---
 name: how
-description: "Use to explain how code works, with walkthroughs."
+description: "讲解代码怎么工作，给出逐步走查."
 version: 0.1.0
 author: poteto (Hermes adaptation)
 license: MIT
@@ -13,58 +13,58 @@ metadata:
 
 # How
 
-Answer "how does X work?" with clear architectural explanations grounded in actual code.
+回答「X 是怎么工作的？」，给出扎根于真实代码的清晰架构讲解。
 
-## When to Use
+## 何时使用
 
-When the user asks how a subsystem, feature, or mechanism works. Also invoked by other pstack skills (e.g. `pstack:architect`) to ground design in existing code.
+用户问某个子系统、功能或机制怎么工作时。也被其他 pstack 技能调用（例如 `pstack:architect`），用来把设计锚在现有代码上。
 
-## Modes
+## 模式
 
-### Explain (default)
+### 讲解（默认）
 
-Explore the codebase and produce an explanation.
+探索代码库，产出一份讲解。
 
-**Simple questions** (single module, one concept): do it in one pass - `search_files` to locate, `read_file` to understand, write the explanation.
+**简单问题**（单个模块、一个概念）：一趟做完。用 `search_files` 定位，用 `read_file` 读懂，然后写讲解。
 
-**Complex questions** (multi-file subsystem, cross-cutting concern): decompose into 2-4 exploration angles, delegate each as a read-only subagent via `delegate_task`, then synthesize results into a single explanation.
+**复杂问题**（跨多文件的子系统、横切关注点）：拆成 2 到 4 个探索角度，每个角度用 `delegate_task` 派一个只读子代理，再把结果综合成一份讲解。
 
-### Critique
+### 批判
 
-Explain first (as above), then spawn multiple `delegate_task` subagents to independently identify architectural issues. Each critic works from the explanation plus direct code access. Synthesize their findings into a problems section appended to the explanation.
+先按上面那样讲解，然后派多个 `delegate_task` 子代理各自独立找架构问题。每个批判者拿着这份讲解，加上直接读代码的权限。把它们的发现综合成一节问题清单，附在讲解后面。
 
-## Exploration Technique
+## 探索手法
 
-Explorers use `search_files` and `read_file` to trace code. The approach:
+探索者用 `search_files` 和 `read_file` 追代码。路子是：
 
-1. **Start broad** - glob for directories (`search_files` with `target="files"`), grep for key types/interfaces/exports. Understand the shape before the details.
+1. **先铺开** - 用 glob 找目录（`search_files` 配 `target="files"`），grep 关键类型、接口、导出。先搞清形状，再看细节。
 
-2. **Follow the thread** - from entry points, trace callers and callees. Follow data flow: where is it created, transformed, consumed? Read actual code at each hop.
+2. **顺着线走** - 从入口出发，追调用方和被调用方。跟着数据流走：它在哪里创建、在哪里变换、在哪里被消费？每一跳都读真实代码。
 
-3. **Read actual code** - don't stop at file names or function signatures. Read the implementation. The interesting behavior lives in the body, not the type.
+3. **读真实代码** - 不要停在文件名或函数签名上。读实现。有意思的行为在函数体里，不在类型里。
 
-4. **Note surprises** - anything that violates the expected pattern is worth calling out. Implicit dependencies, side effects, hidden state, fallback paths.
+4. **记下意外** - 任何违反预期模式的地方都值得点出来。隐式依赖、副作用、隐藏状态、兜底路径。
 
-## Output Format
+## 输出格式
 
-Structure the explanation as:
+讲解按这个结构组织：
 
-- **Overview** - one paragraph, what this subsystem does and why it exists
-- **Key Concepts** - types, abstractions, or domain terms needed to follow along
-- **How It Works** - step-by-step walkthrough of the main flow, referencing files and functions
-- **Where Things Live** - file/directory map of the relevant code
-- **Gotchas** - surprises, implicit contracts, known quirks, easy mistakes
+- **概览** - 一段话，这个子系统做什么，为什么存在
+- **关键概念** - 跟上讲解所需的类型、抽象或领域术语
+- **怎么运作** - 主流程的逐步走查，点到具体文件和函数
+- **东西都在哪** - 相关代码的文件与目录地图
+- **坑点** - 意外之处、隐式契约、已知怪癖、容易犯的错
 
-## Delegation Pattern
+## 委派模式
 
-When decomposing for `delegate_task`:
+为 `delegate_task` 做拆解时：
 
 ```
-Each subagent brief:
-- Goal: "Trace how [specific aspect] works in [scope]"
-- Constraint: read-only, no modifications
-- Tools: search_files, read_file only
-- Output: structured notes with file paths and line references
+每份子代理任务说明：
+- 目标："追清 [具体方面] 在 [范围] 里是怎么工作的"
+- 约束：只读，不做任何修改
+- 工具：只用 search_files、read_file
+- 输出：结构化笔记，带文件路径和行号引用
 ```
 
-Synthesize by merging notes, resolving contradictions (re-read code if needed), and writing the unified explanation.
+综合的做法：合并笔记，解决互相矛盾的地方（必要时重读代码），然后写出统一的讲解。
